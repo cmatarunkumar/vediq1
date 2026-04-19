@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0C0A09;--ink2:#44403C;--mu:#78716C;--mu2:#A8A29E;
+  --bg:#FDFAF6;--card:#fff;--bd:#E7E5E4;--bd2:#D6D3D1;
+  --green:#16A34A;--gs:#F0FDF4;--red:#DC2626;--rs:#FEF2F2;
+  --amber:#D97706;--as:#FFFBEB;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 2px 8px rgba(0,0,0,.05);
+  --sh2:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+h1,h2,h3{font-family:'Sora',sans-serif;}
+button{font-family:'Plus Jakarta Sans',sans-serif;cursor:pointer;}
+input{font-family:'Plus Jakarta Sans',sans-serif;}
+
+.app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:72px;}
+
+/* Screens */
+.screen{display:none;padding:16px;animation:fi .28s ease both;}
+.screen.on{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:50;}
+.topbar-logo{font-family:'Sora',sans-serif;font-size:18px;font-weight:800;color:var(--ink);}
+.topbar-logo b{color:#F97316;}
+.topbar-user{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mu);}
+.avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff;flex-shrink:0;}
+
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(253,250,246,.95);border-top:1px solid var(--bd);display:flex;z-index:100;backdrop-filter:blur(8px);}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 12px;border:none;background:none;color:var(--mu);font-size:9px;font-weight:500;cursor:pointer;transition:.15s;}
+.bnav-item.on{color:#F97316;font-weight:700;}
+.bnav-icon{font-size:19px;line-height:1;}
+
+/* ── AUTH ── */
+#auth{min-height:100vh;display:none;align-items:center;justify-content:center;padding:24px;background:linear-gradient(150deg,#1E3A5F 0%,#0C0A09 100%);}
+#auth.on{display:flex;}
+.auth-card{background:#fff;border-radius:24px;padding:32px 28px;width:100%;max-width:360px;box-shadow:0 24px 64px rgba(0,0,0,.3);}
+.auth-logo{text-align:center;margin-bottom:24px;}
+.auth-logo h1{font-size:30px;font-weight:800;color:var(--ink);}
+.auth-logo h1 b{color:#F97316;}
+.auth-logo p{font-size:12px;color:var(--mu);margin-top:4px;letter-spacing:1.5px;text-transform:uppercase;}
+.auth-tabs{display:flex;background:#F5F0E8;border-radius:12px;padding:3px;gap:3px;margin-bottom:20px;}
+.auth-tab{flex:1;padding:9px;text-align:center;border-radius:9px;font-size:13px;font-weight:600;border:none;background:none;color:var(--mu);cursor:pointer;transition:.18s;}
+.auth-tab.on{background:#fff;color:var(--ink);box-shadow:var(--sh);}
+.auth-fields{display:flex;flex-direction:column;gap:11px;}
+.auth-input{border:1.5px solid var(--bd2);border-radius:11px;padding:12px 14px;font-size:14px;outline:none;transition:.18s;width:100%;}
+.auth-input:focus{border-color:#F97316;box-shadow:0 0 0 3px rgba(249,115,22,.1);}
+.auth-err{font-size:12px;color:var(--red);text-align:center;}
+.auth-btn{background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;width:100%;margin-top:4px;transition:.18s;box-shadow:0 4px 14px rgba(249,115,22,.3);}
+.auth-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(249,115,22,.4);}
+.auth-switch{text-align:center;font-size:12px;color:var(--mu);margin-top:10px;}
+.auth-switch span{color:#F97316;font-weight:700;cursor:pointer;}
+
+/* ── GRADE SELECT ── */
+.grade-hero{background:linear-gradient(145deg,#1E3A5F,#1D4ED8);padding:28px 20px 36px;border-radius:0 0 28px 28px;margin:-16px -16px 20px;position:relative;overflow:hidden;}
+.grade-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);background-size:24px 24px;}
+.grade-hero h2{font-size:22px;font-weight:800;color:#fff;position:relative;}
+.grade-hero p{font-size:13px;color:rgba(255,255,255,.5);margin-top:6px;position:relative;}
+.grade-section{margin-bottom:20px;}
+.grade-section-lbl{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.grade-section-lbl::after{content:'';flex:1;height:1px;background:var(--bd);}
+.grade-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.grade-btn{background:var(--card);border:2px solid var(--bd);border-radius:12px;padding:10px 4px;text-align:center;cursor:pointer;transition:.2s;box-shadow:var(--sh);}
+.grade-btn:hover{border-color:#2563EB;transform:translateY(-2px);box-shadow:var(--sh2);}
+.grade-btn.on{background:linear-gradient(135deg,#1E3A5F,#2563EB);border-color:transparent;box-shadow:0 4px 14px rgba(30,58,95,.35);}
+.grade-btn-n{font-family:'Sora',sans-serif;font-size:17px;font-weight:800;color:#1E3A5F;}
+.grade-btn.on .grade-btn-n{color:#fff;}
+.grade-btn-l{font-size:8.5px;color:var(--mu);}
+.grade-btn.on .grade-btn-l{color:rgba(255,255,255,.6);}
+.stream-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.stream-btn{border:2px solid var(--bd);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;transition:.2s;background:var(--card);box-shadow:var(--sh);}
+.stream-btn:hover{border-color:#F97316;transform:translateY(-2px);}
+.stream-btn.on{border-color:#F97316;background:linear-gradient(160deg,#FFF7ED,#fff);}
+.stream-btn .si{font-size:22px;margin-bottom:6px;}
+.stream-btn .sn{font-size:12px;font-weight:700;}
+.continue-btn{background:linear-gradient(135deg,#0C0A09,#292524);color:#fff;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:700;width:100%;margin-top:8px;transition:.2s;box-shadow:0 4px 14px rgba(12,10,9,.2);}
+.continue-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(12,10,9,.3);}
+.continue-btn:disabled{background:var(--bd);color:var(--mu);box-shadow:none;}
+
+/* ── HOME / DASHBOARD ── */
+.dash-hero{background:linear-gradient(145deg,#1E3A5F,#2563EB);padding:22px 20px 34px;border-radius:0 0 28px 28px;margin:-16px -16px 16px;position:relative;overflow:hidden;}
+.dash-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);background-size:20px 20px;}
+.dash-hero-row{display:flex;justify-content:space-between;align-items:flex-start;position:relative;}
+.dash-greet{font-size:12px;color:rgba(255,255,255,.5);}
+.dash-name{font-size:22px;font-weight:800;color:#fff;margin-top:2px;}
+.dash-class{font-size:12px;color:rgba(255,255,255,.45);margin-top:2px;}
+.streak-box{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:8px 14px;text-align:center;}
+.streak-n{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#FCD34D;}
+.streak-l{font-size:9px;color:rgba(255,255,255,.5);}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+.stat-card{background:var(--card);border:1.5px solid var(--bd);border-radius:14px;padding:10px 6px;text-align:center;box-shadow:var(--sh);}
+.stat-icon{font-size:16px;line-height:1;}
+.stat-val{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;margin-top:2px;}
+.stat-lbl{font-size:9.5px;color:var(--mu);}
+
+.sec-title{font-size:15px;font-weight:700;margin:0 0 12px;}
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;}
+.subj-card{background:var(--card);border-radius:16px;padding:14px;border:1.5px solid var(--bd);text-align:left;cursor:pointer;transition:.2s;box-shadow:var(--sh);border-top:4px solid var(--accent,#F97316);}
+.subj-card:hover{transform:translateY(-2px);box-shadow:var(--sh2);}
+.subj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.subj-icon{font-size:26px;line-height:1;}
+.subj-badge{border-radius:8px;padding:2px 8px;font-size:10px;font-weight:700;}
+.subj-name{font-size:13px;font-weight:700;margin:0 0 2px;}
+.subj-chs{font-size:10px;color:var(--mu);margin:0 0 6px;}
+.prog-bar{height:4px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:4px;}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s;}
+.subj-stats{font-size:10px;color:var(--mu);}
+
+.quick-row{display:flex;flex-direction:column;gap:9px;margin-bottom:20px;}
+.quick-card{background:var(--card);border:1.5px solid var(--bd);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.18s;box-shadow:var(--sh);}
+.quick-card:hover{border-color:#F97316;transform:translateX(3px);}
+.quick-card-icon{font-size:22px;line-height:1;flex-shrink:0;}
+.quick-lbl{font-size:13px;font-weight:700;}
+.quick-sub{font-size:11px;color:var(--mu);margin-top:1px;}
+
+/* ── SUBJECT SCREEN ── */
+.back-btn{display:flex;align-items:center;gap:6px;border:none;background:none;color:#F97316;font-size:14px;font-weight:600;padding:0 0 14px;cursor:pointer;}
+.subj-hero{border-radius:16px;padding:18px;display:flex;align-items:center;gap:16px;margin-bottom:18px;border-bottom:3px solid currentColor;}
+.subj-hero-icon{font-size:38px;line-height:1;}
+.subj-hero-title{font-size:20px;font-weight:800;margin:0 0 3px;}
+.subj-hero-sub{font-size:12px;color:#555;margin:0;}
+.filter-card{background:var(--card);border-radius:16px;padding:16px;border:1.5px solid var(--bd);box-shadow:var(--sh);}
+.filter-lbl{display:block;font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;}
+.pill-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+.pill{border:1.5px solid var(--bd2);border-radius:20px;padding:5px 13px;font-size:12px;background:var(--card);cursor:pointer;font-weight:500;transition:.15s;}
+.pill:hover{border-color:#F97316;}
+.sel-select{width:100%;border:1.5px solid var(--bd2);border-radius:11px;padding:10px 12px;font-size:14px;margin-bottom:14px;outline:none;background:var(--card);cursor:pointer;}
+.avail-badge{background:#EFF6FF;border-radius:10px;padding:8px 12px;font-size:12px;color:#2563EB;margin-bottom:14px;text-align:center;font-weight:700;border:1px solid #BFDBFE;}
+.start-btn{width:100%;border:none;border-radius:13px;padding:14px;color:#fff;font-size:15px;font-weight:700;transition:.2s;cursor:pointer;}
+.start-btn:hover{filter:brightness(1.08);transform:translateY(-1px);}
+.start-btn:disabled{background:var(--bd)!important;color:var(--mu);cursor:not-allowed;transform:none;filter:none;}
+
+/* ── QUIZ SCREEN ── */
+#quiz{padding:0 16px 16px;}
+.quiz-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;}
+.quiz-progress{font-family:'Sora',sans-serif;font-size:18px;font-weight:700;}
+.timer-badge{padding:4px 11px;border-radius:9px;font-size:13px;font-weight:700;border:1.5px solid;}
+.timer-bar-wrap{height:5px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:8px;}
+.timer-bar{height:100%;border-radius:3px;transition:width 1s linear;}
+.dot-row{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;margin-bottom:14px;}
+.dot{border-radius:50%;transition:all .25s;}
+.q-card{background:var(--card);border-radius:16px;padding:16px;margin-bottom:14px;border:1.5px solid var(--bd);box-shadow:var(--sh);position:relative;overflow:hidden;}
+.q-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.q-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.q-badge{border-radius:7px;padding:2px 8px;font-size:10.5px;font-weight:700;}
+.q-text{font-size:15px;font-weight:600;color:var(--ink);line-height:1.6;margin:0;}
+.opts{display:flex;flex-direction:column;gap:9px;}
+.opt-btn{display:flex;align-items:center;gap:12px;padding:12px 14px;border:2px solid var(--bd);border-radius:13px;background:var(--card);cursor:pointer;font-size:14px;text-align:left;transition:.18s;box-shadow:var(--sh);}
+.opt-btn:hover:not(:disabled){border-color:#2563EB;background:#EFF6FF;}
+.opt-btn.ok{background:#F0FDF4;border-color:#16A34A;}
+.opt-btn.wrong{background:#FEF2F2;border-color:#DC2626;}
+.opt-btn.reveal{background:#F0FDF4;border-color:#16A34A;opacity:.7;}
+.opt-letter{min-width:28px;height:28px;border-radius:9px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.opt-text{flex:1;line-height:1.4;color:var(--ink);}
+.fib-wrap{margin-top:4px;}
+.fib-input{width:100%;border:2px solid var(--bd2);border-radius:13px;padding:13px 15px;font-size:15px;outline:none;transition:.18s;background:var(--card);}
+.fib-input:focus{border-color:#F97316;}
+.fib-submit{width:100%;border:none;border-radius:12px;padding:13px;color:#fff;font-size:14px;font-weight:700;margin-top:10px;cursor:pointer;transition:.18s;}
+.exp-box{border-radius:14px;padding:14px;margin-top:14px;border-left:4px solid;}
+.exp-title{font-size:13px;font-weight:700;margin:0 0 5px;}
+.exp-text{font-size:13px;color:#555;margin:0;line-height:1.6;}
+.next-btn{width:100%;border:none;border-radius:13px;padding:14px;color:#fff;font-size:15px;font-weight:700;margin-top:14px;cursor:pointer;transition:.18s;}
+
+/* ── RESULTS ── */
+.result-hero{border-radius:18px;padding:24px 16px;text-align:center;margin-bottom:16px;}
+.grade-circle{width:64px;height:64px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:10px;}
+.result-pct{font-family:'Sora',sans-serif;font-size:52px;font-weight:800;color:var(--ink);margin:0 0 2px;}
+.result-sub{font-size:14px;color:var(--mu);margin:0 0 16px;}
+.result-stats{display:flex;justify-content:center;gap:28px;}
+.r-stat-val{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;display:block;}
+.r-stat-lbl{font-size:11px;color:var(--mu);}
+.tab-row{display:flex;border-bottom:1px solid var(--bd);margin-bottom:16px;}
+.tab-btn{flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--mu);border-bottom:2px solid transparent;font-weight:600;transition:.15s;}
+.tab-btn.on{border-bottom-color:#F97316;color:#F97316;}
+.ch-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.ch-name{font-size:11px;color:#555;width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ch-bar-wrap{flex:1;height:7px;background:var(--bd);border-radius:4px;overflow:hidden;}
+.ch-bar-fill{height:100%;border-radius:4px;transition:width .5s;}
+.ch-pct{font-size:11px;font-weight:700;width:32px;text-align:right;}
+.review-card{background:var(--card);border-radius:12px;padding:13px;margin-bottom:10px;border:1.5px solid var(--bd);}
+.review-q{font-size:13px;color:var(--ink);margin:0 0 6px;line-height:1.5;}
+.review-ans{font-size:12px;margin:2px 0;}
+.act-row{display:flex;gap:10px;margin-top:20px;}
+.act-btn{flex:1;border:none;border-radius:13px;padding:14px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:.18s;}
+.act-btn:hover{filter:brightness(1.1);}
+.act-btn-sec{background:var(--card);color:var(--ink);border:2px solid var(--bd2);}
+.act-btn-sec:hover{border-color:#F97316;color:#F97316;filter:none;}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth" class="on">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <h1>Ved<b>IQ</b></h1>
+      <p>Class 1 – 12 · NCERT · AI Adaptive</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab on" onclick="setAuthMode('login')">Sign In</button>
+      <button class="auth-tab" onclick="setAuthMode('signup')">Sign Up</button>
+    </div>
+    <div class="auth-fields">
+      <input id="a-name" class="auth-input" placeholder="Full Name" style="display:none">
+      <input id="a-email" class="auth-input" placeholder="Email" type="email">
+      <input id="a-pass" class="auth-input" placeholder="Password" type="password" onkeydown="if(event.key==='Enter')doAuth()">
+      <div id="a-err" class="auth-err"></div>
+      <button class="auth-btn" onclick="doAuth()"><span id="a-btn-txt">Sign In →</span></button>
+      <p class="auth-switch" id="a-switch">New here? <span onclick="setAuthMode('signup')">Sign up free</span></p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app" style="display:none">
+  <!-- Top bar -->
+  <div class="topbar" id="topbar">
+    <div class="topbar-logo">Ved<b>IQ</b></div>
+    <div class="topbar-user">
+      <span id="tb-class"></span>
+      <div class="avatar" id="tb-avatar" style="background:#F97316">S</div>
+    </div>
+  </div>
+
+  <!-- Grade Select screen -->
+  <div id="grade-sel" class="screen on">
+    <div class="grade-hero">
+      <h2>Which class are you in?</h2>
+      <p>Select your grade to unlock the right subjects</p>
+    </div>
+    <div class="grade-section">
+      <div class="grade-section-lbl">Primary (1–5)</div>
+      <div class="grade-grid" id="grade-primary"></div>
+    </div>
+    <div class="grade-section">
+      <div class="grade-section-lbl">Middle (6–8)</div>
+      <div class="grade-grid" id="grade-middle"></div>
+    </div>
+    <div class="grade-section">
+      <div class="grade-section-lbl">Secondary (9–10)</div>
+      <div class="grade-grid" id="grade-secondary"></div>
+    </div>
+    <div class="grade-section" id="stream-section" style="display:none">
+      <div class="grade-section-lbl">Choose Stream (11–12)</div>
+      <div class="stream-grid" id="stream-grid"></div>
+    </div>
+    <div class="grade-section">
+      <div class="grade-section-lbl">Senior Secondary (11–12)</div>
+      <div class="grade-grid" id="grade-senior"></div>
+    </div>
+    <button class="continue-btn" id="grade-continue" disabled onclick="confirmGrade()">Continue →</button>
+  </div>
+
+  <!-- Home / Dashboard -->
+  <div id="home" class="screen">
+    <div class="dash-hero">
+      <div class="dash-hero-row">
+        <div>
+          <div class="dash-greet">नमस्ते 👋 Welcome back,</div>
+          <div class="dash-name" id="home-name">Student</div>
+          <div class="dash-class" id="home-class">Class 8 · CBSE</div>
+        </div>
+        <div class="streak-box">
+          <div class="streak-n" id="streak-n">0</div>
+          <div class="streak-l">day streak 🔥</div>
+        </div>
+      </div>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="sec-title">Subjects</div>
+    <div class="subj-grid" id="subj-grid"></div>
+    <div class="sec-title">Quick Practice</div>
+    <div class="quick-row">
+      <div class="quick-card" onclick="startMixed()">
+        <div class="quick-card-icon">⚡</div>
+        <div><div class="quick-lbl">Mixed Quiz</div><div class="quick-sub">All subjects · 10 random Qs</div></div>
+      </div>
+      <div class="quick-card" onclick="startDaily()">
+        <div class="quick-card-icon">🏆</div>
+        <div><div class="quick-lbl">Daily Challenge</div><div class="quick-sub">5 curated questions today</div></div>
+      </div>
+      <div class="quick-card" onclick="showScreen('grade-sel')">
+        <div class="quick-card-icon">🎓</div>
+        <div><div class="quick-lbl">Change Grade</div><div class="quick-sub" id="cg-sub">Currently: Class 8</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Subject setup -->
+  <div id="subject" class="screen">
+    <button class="back-btn" onclick="showScreen('home')">← Back</button>
+    <div id="subj-hero" class="subj-hero"></div>
+    <div class="filter-card">
+      <h3 style="font-size:15px;font-weight:700;margin:0 0 16px">Configure Quiz</h3>
+      <label class="filter-lbl">Chapter</label>
+      <select class="sel-select" id="f-chapter"></select>
+      <label class="filter-lbl">Difficulty</label>
+      <div class="pill-row" id="f-diff-row"></div>
+      <label class="filter-lbl">Question Type</label>
+      <div class="pill-row" id="f-type-row"></div>
+      <label class="filter-lbl">Number of Questions</label>
+      <div class="pill-row" id="f-count-row"></div>
+      <div class="avail-badge" id="avail-badge">0 questions match</div>
+      <button class="start-btn" id="start-quiz-btn" onclick="beginQuiz()">Start Quiz →</button>
+    </div>
+  </div>
+
+  <!-- Quiz -->
+  <div id="quiz" class="screen">
+    <div class="quiz-hdr">
+      <button style="border:none;background:none;color:var(--red);font-size:14px;font-weight:600;cursor:pointer;" onclick="confirmQuit()">✕ Quit</button>
+      <div class="quiz-progress"><span id="q-cur" style="color:#F97316">1</span><span style="color:var(--mu)">/</span><span id="q-tot">10</span></div>
+      <div class="timer-badge" id="timer-badge">⏱ 30s</div>
+    </div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar" style="width:100%;background:#F97316"></div></div>
+    <div class="dot-row" id="dot-row"></div>
+    <div class="q-card" id="q-card">
+      <div style="position:absolute;left:0;top:0;bottom:0;width:4px;background:#F97316;border-radius:4px 0 0 4px;" id="q-card-accent"></div>
+      <div class="q-meta" id="q-meta"></div>
+      <p class="q-text" id="q-text"></p>
+    </div>
+    <div id="q-opts"></div>
+    <div id="q-exp" style="display:none"></div>
+    <button id="q-next" class="next-btn" style="display:none;background:#F97316" onclick="nextQ()">Next →</button>
+  </div>
+
+  <!-- Results -->
+  <div id="result" class="screen">
+    <div id="result-hero" class="result-hero"></div>
+    <div class="tab-row">
+      <button class="tab-btn on" id="tab-summary" onclick="setTab('summary')">Summary</button>
+      <button class="tab-btn" id="tab-review" onclick="setTab('review')">Review Answers</button>
+    </div>
+    <div id="tab-content"></div>
+    <div class="act-row">
+      <button class="act-btn act-btn-sec" onclick="showScreen('home')">🏠 Home</button>
+      <button class="act-btn" id="retry-btn" style="background:#F97316" onclick="retryQuiz()">↺ Retry</button>
+    </div>
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bnav" id="bnav">
+    <button class="bnav-item on" onclick="navTo('home')" id="nav-home"><div class="bnav-icon">🏠</div><div>Home</div></button>
+    <button class="bnav-item" onclick="navTo('subject')" id="nav-subject"><div class="bnav-icon">📚</div><div>Subjects</div></button>
+    <button class="bnav-item" onclick="navTo('result')" id="nav-result"><div class="bnav-icon">📊</div><div>Results</div></button>
+    <button class="bnav-item" onclick="showScreen('grade-sel')" id="nav-grade"><div class="bnav-icon">🎓</div><div>Grade</div></button>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   DATA — Subjects & Questions per Grade Group
+════════════════════════════════════════════════════════ */
+const GRADE_SUBJECTS = {
+  primary:{
+    subjects:{
+      'Mathematics':   {color:'#2563EB',light:'#EFF6FF',icon:'📐'},
+      'Science & EVS': {color:'#16A34A',light:'#F0FDF4',icon:'🌿'},
+      'English':       {color:'#9333EA',light:'#FAF5FF',icon:'📖'},
+      'Hindi':         {color:'#EA580C',light:'#FFF7ED',icon:'🔤'},
+    },
+    questions:{
+      'Mathematics':[
+        {id:'P1',chapter:'Numbers',type:'MCQ',difficulty:'Easy',question:'What comes after 99?',options:['100','90','98','101'],answer:'A',explanation:'100 comes after 99. It is a 3-digit number.',time:20},
+        {id:'P2',chapter:'Addition',type:'MCQ',difficulty:'Easy',question:'12 + 15 = ?',options:['25','27','28','26'],answer:'B',explanation:'12 + 15 = 27',time:20},
+        {id:'P3',chapter:'Subtraction',type:'MCQ',difficulty:'Easy',question:'20 − 8 = ?',options:['10','11','12','13'],answer:'C',explanation:'20 − 8 = 12',time:20},
+        {id:'P4',chapter:'Shapes',type:'MCQ',difficulty:'Easy',question:'How many sides does a triangle have?',options:['2','3','4','5'],answer:'B',explanation:'A triangle has 3 sides and 3 angles.',time:20},
+        {id:'P5',chapter:'Multiplication',type:'MCQ',difficulty:'Easy',question:'5 × 4 = ?',options:['18','20','22','24'],answer:'B',explanation:'5 × 4 = 20',time:20},
+        {id:'P6',chapter:'Numbers',type:'FIB',difficulty:'Easy',question:'The number 5 written in words is ___.',options:[],answer:'Five',explanation:'5 = Five.',time:20},
+        {id:'P7',chapter:'Shapes',type:'MCQ',difficulty:'Easy',question:'A circle has how many corners?',options:['0','1','2','4'],answer:'A',explanation:'A circle has no corners or edges.',time:20},
+        {id:'P8',chapter:'Division',type:'MCQ',difficulty:'Easy',question:'10 ÷ 2 = ?',options:['3','4','5','6'],answer:'C',explanation:'10 ÷ 2 = 5',time:20},
+        {id:'P9',chapter:'Fractions',type:'MCQ',difficulty:'Medium',question:'Half of 20 is:',options:['8','10','12','15'],answer:'B',explanation:'½ × 20 = 10',time:25},
+        {id:'P10',chapter:'Patterns',type:'MCQ',difficulty:'Easy',question:'2, 4, 6, 8, ___',options:['9','10','11','12'],answer:'B',explanation:'Pattern adds 2 each time. 8 + 2 = 10.',time:20},
+      ],
+      'Science & EVS':[
+        {id:'PS1',chapter:'Plants',type:'MCQ',difficulty:'Easy',question:'Plants make their food using:',options:['Soil','Sunlight','Water','All of these'],answer:'D',explanation:'Plants use sunlight, water and air to make food (photosynthesis).',time:25},
+        {id:'PS2',chapter:'Animals',type:'MCQ',difficulty:'Easy',question:'Which animal gives us milk?',options:['Dog','Cow','Cat','Parrot'],answer:'B',explanation:'Cows are domesticated for milk.',time:20},
+        {id:'PS3',chapter:'Our Body',type:'MCQ',difficulty:'Easy',question:'How many senses do humans have?',options:['3','4','5','6'],answer:'C',explanation:'Sight, hearing, smell, taste and touch.',time:20},
+        {id:'PS4',chapter:'Water',type:'TF',difficulty:'Easy',question:'We should drink clean water to stay healthy.',options:['True','False'],answer:'A',explanation:'Clean water prevents waterborne diseases.',time:15},
+        {id:'PS5',chapter:'Food',type:'MCQ',difficulty:'Easy',question:'Which food gives us energy?',options:['Rice','Lemon','Spinach','Water'],answer:'A',explanation:'Rice is a carbohydrate and provides energy.',time:20},
+        {id:'PS6',chapter:'Plants',type:'FIB',difficulty:'Easy',question:'The process by which plants make food is called ___.',options:[],answer:'Photosynthesis',explanation:'Photosynthesis uses sunlight to make food from CO₂ and water.',time:25},
+        {id:'PS7',chapter:'Air',type:'MCQ',difficulty:'Easy',question:'We breathe in:',options:['Oxygen','Carbon dioxide','Nitrogen','Hydrogen'],answer:'A',explanation:'We inhale oxygen and exhale carbon dioxide.',time:20},
+        {id:'PS8',chapter:'Animals',type:'MCQ',difficulty:'Easy',question:'Which is a domestic animal?',options:['Lion','Tiger','Dog','Fox'],answer:'C',explanation:'Dogs are kept as pets and are domestic animals.',time:20},
+        {id:'PS9',chapter:'Seasons',type:'MCQ',difficulty:'Easy',question:'Which season has the most rain?',options:['Summer','Winter','Monsoon','Spring'],answer:'C',explanation:'Monsoon brings heavy rainfall in India.',time:20},
+        {id:'PS10',chapter:'Our Body',type:'MCQ',difficulty:'Easy',question:'Which organ pumps blood?',options:['Brain','Lungs','Heart','Stomach'],answer:'C',explanation:'The heart pumps blood through the body.',time:20},
+      ],
+      'English':[
+        {id:'PE1',chapter:'Alphabet',type:'MCQ',difficulty:'Easy',question:"'A' is a ___ letter.",options:['Vowel','Consonant','Number','Symbol'],answer:'A',explanation:'A, E, I, O, U are vowels.',time:15},
+        {id:'PE2',chapter:'Nouns',type:'MCQ',difficulty:'Easy',question:"Which is a noun?",options:['Run','Happy','Book','Quickly'],answer:'C',explanation:'A noun is a naming word. Book is a noun.',time:15},
+        {id:'PE3',chapter:'Verbs',type:'MCQ',difficulty:'Easy',question:"'The dog ___.' Which verb fits?",options:['big','fast','barks','happy'],answer:'C',explanation:'Barks is an action word (verb).',time:20},
+        {id:'PE4',chapter:'Pronouns',type:'MCQ',difficulty:'Easy',question:"Replace 'Priya' with a pronoun: '___ is smart.'",options:['He','She','It','They'],answer:'B',explanation:'Priya is a girl, so we use She.',time:20},
+        {id:'PE5',chapter:'Sentences',type:'FIB',difficulty:'Easy',question:"A sentence always starts with a ___ letter.",options:[],answer:'Capital',explanation:'Every sentence begins with a capital letter.',time:20},
+        {id:'PE6',chapter:'Alphabet',type:'MCQ',difficulty:'Easy',question:"How many letters are in the English alphabet?",options:['24','25','26','27'],answer:'C',explanation:'There are 26 letters: A to Z.',time:15},
+        {id:'PE7',chapter:'Punctuation',type:'MCQ',difficulty:'Easy',question:"A question ends with a:",options:['Full stop','Comma','Question mark','Exclamation mark'],answer:'C',explanation:'Questions end with ? mark.',time:15},
+        {id:'PE8',chapter:'Nouns',type:'TF',difficulty:'Easy',question:"'Mumbai' is a proper noun.",options:['True','False'],answer:'A',explanation:'Names of places are proper nouns.',time:15},
+        {id:'PE9',chapter:'Adjectives',type:'MCQ',difficulty:'Easy',question:"Which word describes a noun?",options:['Run','Beautiful','Quickly','And'],answer:'B',explanation:'Beautiful is an adjective — it describes a noun.',time:15},
+        {id:'PE10',chapter:'Sentences',type:'MCQ',difficulty:'Easy',question:"'The cat sat on the mat.' is a:",options:['Question','Command','Statement','Exclamation'],answer:'C',explanation:'It states a fact, so it is a statement.',time:20},
+      ],
+      'Hindi':[
+        {id:'PH1',chapter:'वर्णमाला',type:'MCQ',difficulty:'Easy',question:"हिंदी वर्णमाला में कितने स्वर होते हैं?",options:['10','11','12','13'],answer:'B',explanation:'हिंदी में 11 स्वर: अ, आ, इ, ई, उ, ऊ, ऋ, ए, ऐ, ओ, औ',time:20},
+        {id:'PH2',chapter:'शब्द',type:'MCQ',difficulty:'Easy',question:"'पानी' का अर्थ है:",options:['Fire','Water','Air','Earth'],answer:'B',explanation:'पानी = Water (जल)',time:15},
+        {id:'PH3',chapter:'वाक्य',type:'FIB',difficulty:'Easy',question:"'___ मेरा देश है।' — रिक्त स्थान भरो।",options:[],answer:'भारत',explanation:'भारत मेरा देश है।',time:20},
+        {id:'PH4',chapter:'गिनती',type:'MCQ',difficulty:'Easy',question:"'पाँच' को अंकों में लिखो:",options:['3','4','5','6'],answer:'C',explanation:'पाँच = 5',time:15},
+        {id:'PH5',chapter:'शब्द',type:'MCQ',difficulty:'Easy',question:"'आम' किस श्रेणी में आता है?",options:['जानवर','फल','सब्ज़ी','फूल'],answer:'B',explanation:'आम एक फल है।',time:15},
+        {id:'PH6',chapter:'वर्णमाला',type:'MCQ',difficulty:'Easy',question:"'क' के बाद क्या आता है?",options:['ग','ख','च','त'],answer:'B',explanation:'क, ख, ग, घ — यह क्रम है।',time:15},
+        {id:'PH7',chapter:'शब्द',type:'MCQ',difficulty:'Easy',question:"'गाय' देती है:",options:['अंडा','दूध','शहद','ऊन'],answer:'B',explanation:'गाय से दूध मिलता है।',time:15},
+        {id:'PH8',chapter:'वाक्य',type:'TF',difficulty:'Easy',question:"हिंदी में वाक्य के अंत में पूर्ण विराम (।) लगता है।",options:['True','False'],answer:'A',explanation:'हिंदी वाक्य के अंत में पूर्ण विराम (।) लगाते हैं।',time:15},
+        {id:'PH9',chapter:'गिनती',type:'MCQ',difficulty:'Easy',question:"'दस' से बड़ी संख्या कौन सी है?",options:['सात','आठ','नौ','ग्यारह'],answer:'D',explanation:'ग्यारह = 11, जो दस से बड़ी है।',time:20},
+        {id:'PH10',chapter:'शब्द',type:'MCQ',difficulty:'Easy',question:"'नमस्ते' का अर्थ है:",options:['Goodbye','Good morning','Hello/Greetings','Thank you'],answer:'C',explanation:'नमस्ते एक अभिवादन (greeting) है।',time:15},
+      ],
+    }
+  },
+  middle:{
+    subjects:{
+      'Mathematics':    {color:'#2563EB',light:'#EFF6FF',icon:'📐'},
+      'Science':        {color:'#16A34A',light:'#F0FDF4',icon:'🔬'},
+      'Social Science': {color:'#DC2626',light:'#FEF2F2',icon:'🌍'},
+      'English':        {color:'#9333EA',light:'#FAF5FF',icon:'📖'},
+      'Hindi':          {color:'#EA580C',light:'#FFF7ED',icon:'🔤'},
+    },
+    questions:{
+      'Mathematics':[
+        {id:'M1',chapter:'Rational Numbers',type:'MCQ',difficulty:'Easy',question:'Which property states a + b = b + a for rational numbers?',options:['Commutative','Associative','Distributive','Closure'],answer:'A',explanation:'Addition of rational numbers is commutative: a + b = b + a.',time:30},
+        {id:'M2',chapter:'Rational Numbers',type:'MCQ',difficulty:'Easy',question:'The additive identity for rational numbers is:',options:['1','-1','0','1/2'],answer:'C',explanation:'0 is the additive identity because a + 0 = a.',time:25},
+        {id:'M3',chapter:'Linear Equations',type:'MCQ',difficulty:'Easy',question:'Solve: 2x + 3 = 11. x = ?',options:['3','4','5','6'],answer:'B',explanation:'2x = 8, x = 4',time:30},
+        {id:'M4',chapter:'Squares & Roots',type:'MCQ',difficulty:'Easy',question:'What is 13²?',options:['156','169','196','144'],answer:'B',explanation:'13 × 13 = 169',time:25},
+        {id:'M5',chapter:'Squares & Roots',type:'FIB',difficulty:'Easy',question:'√144 = ___.',options:[],answer:'12',explanation:'12 × 12 = 144',time:20},
+        {id:'M6',chapter:'Comparing Quantities',type:'MCQ',difficulty:'Easy',question:'What percent of 200 is 50?',options:['20%','25%','30%','15%'],answer:'B',explanation:'(50/200)×100 = 25%',time:30},
+        {id:'M7',chapter:'Comparing Quantities',type:'MCQ',difficulty:'Medium',question:'Shirt costs ₹400, sold for ₹480. Profit% is:',options:['15%','20%','25%','10%'],answer:'B',explanation:'Profit=80, Profit%=80/400×100=20%',time:40},
+        {id:'M8',chapter:'Mensuration',type:'MCQ',difficulty:'Easy',question:'Volume of a cube with side 5 cm:',options:['125 cm³','25 cm³','75 cm³','100 cm³'],answer:'A',explanation:'V = s³ = 5³ = 125 cm³',time:30},
+        {id:'M9',chapter:'Exponents',type:'MCQ',difficulty:'Easy',question:'2³ × 2⁴ = ?',options:['2⁷','2¹²','4⁷','2'],answer:'A',explanation:'aᵐ × aⁿ = aᵐ⁺ⁿ = 2⁷',time:25},
+        {id:'M10',chapter:'Algebraic Expressions',type:'MCQ',difficulty:'Medium',question:'(a + b)² = ?',options:['a²+b²','a²+2ab+b²','a²−2ab+b²','a²−b²'],answer:'B',explanation:'(a+b)² = a² + 2ab + b²',time:30},
+        {id:'M11',chapter:'Data Handling',type:'MCQ',difficulty:'Easy',question:'Most frequently occurring value is called:',options:['Mean','Median','Mode','Range'],answer:'C',explanation:'Mode is the most frequent value.',time:25},
+        {id:'M12',chapter:'Data Handling',type:'MCQ',difficulty:'Easy',question:'A die is rolled. P(4) = ?',options:['1/4','1/6','1/3','1/2'],answer:'B',explanation:'6 equal outcomes, P(4) = 1/6.',time:25},
+      ],
+      'Science':[
+        {id:'S1',chapter:'Crop Production',type:'MCQ',difficulty:'Easy',question:'Kharif crops are grown in which season?',options:['Winter','Summer','Rainy','Spring'],answer:'C',explanation:'Kharif crops like rice grow in rainy season (June–Oct).',time:25},
+        {id:'S2',chapter:'Microorganisms',type:'MCQ',difficulty:'Easy',question:'Which disease is caused by a virus?',options:['Cholera','Typhoid','Common Cold','Malaria'],answer:'C',explanation:'Common cold is caused by rhinovirus.',time:25},
+        {id:'S3',chapter:'Microorganisms',type:'TF',difficulty:'Easy',question:'Bacteria are used to make antibiotics.',options:['True','False'],answer:'A',explanation:'Streptomycin is derived from Streptomyces bacteria.',time:20},
+        {id:'S4',chapter:'Metals & Non-metals',type:'MCQ',difficulty:'Easy',question:'Which property allows metals to be drawn into wires?',options:['Malleability','Ductility','Conductivity','Lustre'],answer:'B',explanation:'Ductility = ability to draw into thin wires.',time:25},
+        {id:'S5',chapter:'Cell',type:'MCQ',difficulty:'Easy',question:'Who discovered the cell?',options:['Robert Brown','Charles Darwin','Robert Hooke','Louis Pasteur'],answer:'C',explanation:'Robert Hooke discovered cells in 1665.',time:25},
+        {id:'S6',chapter:'Cell',type:'FIB',difficulty:'Easy',question:'The powerhouse of the cell is the ___.',options:[],answer:'Mitochondria',explanation:'Mitochondria produce ATP through cellular respiration.',time:20},
+        {id:'S7',chapter:'Force',type:'MCQ',difficulty:'Easy',question:'Friction acts ___ to direction of motion.',options:['Same direction','Opposite','Perpendicular','Upward'],answer:'B',explanation:'Friction opposes motion.',time:25},
+        {id:'S8',chapter:'Light',type:'MCQ',difficulty:'Easy',question:'Angle of incidence equals angle of reflection — this is:',options:["Snell's law","Law of reflection","Law of refraction","Brewster's law"],answer:'B',explanation:'Law of reflection states angle of incidence = angle of reflection.',time:25},
+        {id:'S9',chapter:'Sound',type:'TF',difficulty:'Easy',question:'Ultrasound has frequency above 20,000 Hz.',options:['True','False'],answer:'A',explanation:'Ultrasound > 20 kHz, beyond human hearing.',time:20},
+        {id:'S10',chapter:'Conservation',type:'FIB',difficulty:'Easy',question:"Project Tiger was started in India in _____.",options:[],answer:'1973',explanation:'Project Tiger launched 1973 to protect Bengal tigers.',time:25},
+      ],
+      'Social Science':[
+        {id:'SS1',chapter:'Revolt of 1857',type:'MCQ',difficulty:'Easy',question:'Immediate cause of the 1857 revolt was:',options:['Land reforms','Greased cartridges','Child marriage','Abolition of sati'],answer:'B',explanation:'Soldiers refused cartridges rumoured greased with cow and pig fat.',time:25},
+        {id:'SS2',chapter:'Indian Constitution',type:'MCQ',difficulty:'Easy',question:"India's Constitution came into effect on:",options:['15 Aug 1947','26 Nov 1949','26 Jan 1950','2 Oct 1950'],answer:'C',explanation:'Constitution enacted on 26 January 1950.',time:25},
+        {id:'SS3',chapter:'Indian Constitution',type:'MCQ',difficulty:'Easy',question:'Who chaired the Drafting Committee?',options:['Nehru','Patel','B.R. Ambedkar','Rajendra Prasad'],answer:'C',explanation:'Dr B.R. Ambedkar chaired the Drafting Committee.',time:25},
+        {id:'SS4',chapter:'Resources',type:'MCQ',difficulty:'Easy',question:'Which is a non-renewable resource?',options:['Wind','Solar','Coal','Water'],answer:'C',explanation:'Coal takes millions of years to form.',time:20},
+        {id:'SS5',chapter:'Agriculture',type:'TF',difficulty:'Easy',question:'The Green Revolution increased food production in 1960s.',options:['True','False'],answer:'A',explanation:'Green Revolution introduced HYV seeds and modern farming.',time:20},
+        {id:'SS6',chapter:'Industries',type:'TF',difficulty:'Easy',question:'Jamshedpur is known as the steel city of India.',options:['True','False'],answer:'A',explanation:"Tata Steel at Jamshedpur is India's first integrated steel plant.",time:20},
+        {id:'SS7',chapter:'Nationalism',type:'MCQ',difficulty:'Easy',question:'The Indian National Congress was founded in:',options:['1885','1857','1905','1920'],answer:'A',explanation:'INC founded 1885 by A.O. Hume.',time:20},
+        {id:'SS8',chapter:'Judiciary',type:'MCQ',difficulty:'Easy',question:'The highest court in India is the:',options:['High Court','District Court','Supreme Court','Family Court'],answer:'C',explanation:'Supreme Court is the apex court.',time:20},
+        {id:'SS9',chapter:'Land Resources',type:'MCQ',difficulty:'Easy',question:'The most fertile soil in India is:',options:['Red','Black','Alluvial','Laterite'],answer:'C',explanation:'Alluvial soil in river plains is most fertile.',time:25},
+        {id:'SS10',chapter:'Human Resources',type:'MCQ',difficulty:'Medium',question:'Which state has highest literacy rate in India?',options:['Kerala','Delhi','Goa','Maharashtra'],answer:'A',explanation:'Kerala has ~94% literacy rate.',time:25},
+      ],
+      'English':[
+        {id:'E1',chapter:'Tenses',type:'MCQ',difficulty:'Easy',question:"'She ___ to school every day.'",options:['go','goes','gone','going'],answer:'B',explanation:'Third-person singular present requires goes.',time:20},
+        {id:'E2',chapter:'Parts of Speech',type:'MCQ',difficulty:'Easy',question:'Which is an abstract noun?',options:['Table','River','Honesty','Flower'],answer:'C',explanation:'Abstract nouns name qualities/ideas.',time:20},
+        {id:'E3',chapter:'Voice',type:'MCQ',difficulty:'Easy',question:"'The cake was eaten by Tom' is in ___ voice.",options:['Active','Passive','Both','Neither'],answer:'B',explanation:'Was + past participle = passive.',time:20},
+        {id:'E4',chapter:'Articles',type:'MCQ',difficulty:'Easy',question:"'I saw ___ elephant.' Fill in:",options:['a','an','the','—'],answer:'B',explanation:"'An' before vowel sounds.",time:20},
+        {id:'E5',chapter:'Vocabulary',type:'MCQ',difficulty:'Easy',question:"Synonym of 'Brave':",options:['Coward','Fearless','Timid','Weak'],answer:'B',explanation:"Brave = Fearless.",time:20},
+        {id:'E6',chapter:'Conjunctions',type:'MCQ',difficulty:'Easy',question:'Which is a coordinating conjunction?',options:['Although','Because','And','Since'],answer:'C',explanation:'FANBOYS are coordinating conjunctions.',time:20},
+        {id:'E7',chapter:'Speech',type:'MCQ',difficulty:'Easy',question:"He said, 'I am happy.' Indirect speech:",options:["He said that he was happy.","He said that I am happy.","He told I was happy.","He said I am happy."],answer:'A',explanation:"'said' stays; 'I am' → 'he was'",time:25},
+        {id:'E8',chapter:'Punctuation',type:'MCQ',difficulty:'Easy',question:'An exclamatory sentence ends with:',options:['Full stop','? mark','! mark','Comma'],answer:'C',explanation:'Exclamatory sentences end with !',time:15},
+        {id:'E9',chapter:'Prepositions',type:'MCQ',difficulty:'Easy',question:"'She is fond ___ dancing.'",options:['in','of','at','for'],answer:'B',explanation:"'Fond of' is correct.",time:20},
+        {id:'E10',chapter:'Vocabulary',type:'MCQ',difficulty:'Easy',question:"'Bite the bullet' means:",options:['To be angry','Endure pain stoically','To eat fast','To fight'],answer:'B',explanation:"'Bite the bullet' = endure bravely.",time:25},
+      ],
+      'Hindi':[
+        {id:'H1',chapter:'व्याकरण',type:'MCQ',difficulty:'Easy',question:"संज्ञा किसे कहते हैं?",options:['क्रिया का नाम','किसी व्यक्ति/वस्तु/स्थान का नाम','विशेषण','सर्वनाम'],answer:'B',explanation:'संज्ञा = किसी व्यक्ति, वस्तु या स्थान का नाम।',time:25},
+        {id:'H2',chapter:'व्याकरण',type:'MCQ',difficulty:'Easy',question:"'राम खाना खाता है।' में क्रिया है:",options:['राम','खाना','खाता है','कोई नहीं'],answer:'C',explanation:"'खाता है' क्रिया (action word) है।",time:20},
+        {id:'H3',chapter:'वर्ण',type:'MCQ',difficulty:'Easy',question:"हिंदी में कितने व्यंजन हैं?",options:['33','34','35','36'],answer:'A',explanation:'हिंदी वर्णमाला में 33 व्यंजन हैं।',time:25},
+        {id:'H4',chapter:'मुहावरे',type:'MCQ',difficulty:'Medium',question:"'आँखें खुलना' मुहावरे का अर्थ है:",options:['नींद आना','सच जानना','रोना','देखना'],answer:'B',explanation:"'आँखें खुलना' = सच्चाई का पता चलना।",time:30},
+        {id:'H5',chapter:'काल',type:'MCQ',difficulty:'Easy',question:"'वह जा रहा है।' किस काल में है?",options:['भूतकाल','वर्तमान काल','भविष्यकाल','सभी'],answer:'B',explanation:"'जा रहा है' वर्तमान काल (Present Tense) है।",time:25},
+        {id:'H6',chapter:'वर्ण',type:'FIB',difficulty:'Easy',question:"अ, आ, इ, ई — ये ___ हैं।",options:[],answer:'स्वर',explanation:'अ, आ, इ, ई हिंदी के स्वर हैं।',time:20},
+        {id:'H7',chapter:'व्याकरण',type:'TF',difficulty:'Easy',question:"'पानी' एक स्त्रीलिंग शब्द है।",options:['True','False'],answer:'B',explanation:"'पानी' पुल्लिंग (masculine) है।",time:20},
+        {id:'H8',chapter:'कविता',type:'MCQ',difficulty:'Easy',question:"कबीर किस भाषा में लिखते थे?",options:['संस्कृत','हिंदी/सधुक्कड़ी','अरबी','फारसी'],answer:'B',explanation:'कबीर सधुक्कड़ी भाषा में लिखते थे।',time:25},
+        {id:'H9',chapter:'मुहावरे',type:'MCQ',difficulty:'Medium',question:"'नौ दो ग्यारह होना' का अर्थ है:",options:['गिनती करना','भाग जाना','लड़ना','मिलना'],answer:'B',explanation:"'नौ दो ग्यारह होना' = भाग जाना।",time:30},
+        {id:'H10',chapter:'व्याकरण',type:'MCQ',difficulty:'Easy',question:"'सुंदर' शब्द कौन सा है?",options:['संज्ञा','सर्वनाम','विशेषण','क्रिया'],answer:'C',explanation:"'सुंदर' विशेषण (Adjective) है।",time:20},
+      ],
+    }
+  },
+  secondary:{
+    subjects:{
+      'Mathematics': {color:'#2563EB',light:'#EFF6FF',icon:'📐'},
+      'Science':     {color:'#16A34A',light:'#F0FDF4',icon:'🔬'},
+      'History':     {color:'#92400E',light:'#FFFBEB',icon:'🏛️'},
+      'Geography':   {color:'#0891B2',light:'#ECFEFF',icon:'🌍'},
+      'Civics':      {color:'#7C3AED',light:'#FAF5FF',icon:'⚖️'},
+      'English':     {color:'#9333EA',light:'#FAF5FF',icon:'📖'},
+    },
+    questions:{
+      'Mathematics':[
+        {id:'SM1',chapter:'Real Numbers',type:'MCQ',difficulty:'Easy',question:'HCF of 12 and 18 is:',options:['3','6','9','12'],answer:'B',explanation:'Factors of 12: 1,2,3,4,6,12. Factors of 18: 1,2,3,6,9,18. HCF = 6.',time:30},
+        {id:'SM2',chapter:'Polynomials',type:'MCQ',difficulty:'Easy',question:'Degree of polynomial 3x² + 2x − 1 is:',options:['1','2','3','0'],answer:'B',explanation:'Highest power of x is 2.',time:25},
+        {id:'SM3',chapter:'Quadratic Equations',type:'MCQ',difficulty:'Medium',question:'Roots of x² − 5x + 6 = 0 are:',options:['2, 3','1, 6','−2, −3','2, −3'],answer:'A',explanation:'(x−2)(x−3)=0 → x=2 or x=3.',time:35},
+        {id:'SM4',chapter:'Triangles',type:'MCQ',difficulty:'Easy',question:'Pythagoras theorem: In right triangle, c² = ?',options:['a+b','a²−b²','a²+b²','2ab'],answer:'C',explanation:'c² = a² + b² where c is hypotenuse.',time:25},
+        {id:'SM5',chapter:'Coordinate Geometry',type:'MCQ',difficulty:'Easy',question:'Distance between (0,0) and (3,4) is:',options:['3','4','5','7'],answer:'C',explanation:'√(3²+4²) = √25 = 5.',time:30},
+        {id:'SM6',chapter:'Trigonometry',type:'MCQ',difficulty:'Easy',question:'sin 30° = ?',options:['1','½','√3/2','1/√2'],answer:'B',explanation:'sin 30° = 1/2.',time:25},
+        {id:'SM7',chapter:'Statistics',type:'MCQ',difficulty:'Easy',question:'Mean of 2, 4, 6, 8, 10 is:',options:['5','6','7','4'],answer:'B',explanation:'Sum=30, Count=5, Mean=6.',time:25},
+        {id:'SM8',chapter:'Probability',type:'MCQ',difficulty:'Easy',question:'P(event) always lies between:',options:['0 and 1','−1 and 1','1 and 2','0 and 2'],answer:'A',explanation:'Probability is always between 0 and 1.',time:20},
+        {id:'SM9',chapter:'Surface Areas',type:'MCQ',difficulty:'Medium',question:'Curved surface area of cylinder (r=7, h=10) cm² = ?',options:['440','220','880','110'],answer:'A',explanation:'CSA = 2πrh = 2 × 22/7 × 7 × 10 = 440.',time:35},
+        {id:'SM10',chapter:'Arithmetic Progressions',type:'MCQ',difficulty:'Medium',question:'6th term of AP: 2, 5, 8, …',options:['14','17','11','20'],answer:'B',explanation:'a=2, d=3, a₆=2+5×3=17.',time:30},
+      ],
+      'Science':[
+        {id:'SSci1',chapter:'Chemical Reactions',type:'MCQ',difficulty:'Easy',question:'A reaction releasing heat is called:',options:['Endothermic','Exothermic','Decomposition','Displacement'],answer:'B',explanation:'Exothermic reactions release heat.',time:25},
+        {id:'SSci2',chapter:'Acids & Bases',type:'MCQ',difficulty:'Easy',question:'pH of a neutral solution is:',options:['0','7','14','1'],answer:'B',explanation:'Neutral solutions have pH = 7.',time:20},
+        {id:'SSci3',chapter:'Metals & Non-metals',type:'MCQ',difficulty:'Easy',question:'Most abundant metal in Earth crust:',options:['Iron','Copper','Aluminium','Gold'],answer:'C',explanation:'Aluminium is most abundant metal (~8%).',time:25},
+        {id:'SSci4',chapter:'Life Processes',type:'MCQ',difficulty:'Easy',question:'Photosynthesis occurs in which organelle?',options:['Mitochondria','Nucleus','Chloroplast','Ribosome'],answer:'C',explanation:'Chloroplasts contain chlorophyll for photosynthesis.',time:25},
+        {id:'SSci5',chapter:'Control & Coordination',type:'MCQ',difficulty:'Easy',question:'Largest part of human brain is:',options:['Cerebellum','Medulla','Cerebrum','Pons'],answer:'C',explanation:'Cerebrum controls thinking, memory and voluntary actions.',time:25},
+        {id:'SSci6',chapter:'Heredity',type:'MCQ',difficulty:'Medium',question:'DNA stands for:',options:['Deoxyribonucleic Acid','Diribose Nucleic Acid','Deoxyribose Nitrogen Acid','None'],answer:'A',explanation:'DNA = Deoxyribonucleic Acid, carrier of genetic info.',time:25},
+        {id:'SSci7',chapter:'Electricity',type:'MCQ',difficulty:'Easy',question:"Ohm's law: V = ?",options:['I/R','IR','I+R','I−R'],answer:'B',explanation:'V = IR (Voltage = Current × Resistance).',time:25},
+        {id:'SSci8',chapter:'Light',type:'MCQ',difficulty:'Easy',question:'Speed of light in vacuum:',options:['3×10⁸ m/s','3×10⁶ m/s','3×10¹⁰ m/s','3×10⁵ m/s'],answer:'A',explanation:'Speed of light ≈ 3×10⁸ m/s.',time:20},
+        {id:'SSci9',chapter:'Our Environment',type:'MCQ',difficulty:'Easy',question:'Ozone layer protects from:',options:['UV rays','Infrared rays','X-rays','Radio waves'],answer:'A',explanation:'Ozone absorbs harmful UV radiation.',time:20},
+        {id:'SSci10',chapter:'Reproduction',type:'MCQ',difficulty:'Easy',question:'Binary fission occurs in:',options:['Amoeba','Hydra','Yeast','Plasmodium'],answer:'A',explanation:'Amoeba reproduces by binary fission.',time:20},
+      ],
+      'History':[
+        {id:'Hist1',chapter:'French Revolution',type:'MCQ',difficulty:'Easy',question:'The French Revolution began in:',options:['1789','1776','1815','1799'],answer:'A',explanation:'The French Revolution started in 1789.',time:25},
+        {id:'Hist2',chapter:'Nationalism in India',type:'MCQ',difficulty:'Easy',question:'Non-Cooperation Movement started in:',options:['1919','1920','1921','1922'],answer:'B',explanation:'Gandhi launched Non-Cooperation Movement in 1920.',time:25},
+        {id:'Hist3',chapter:'Nationalism in India',type:'MCQ',difficulty:'Easy',question:'Dandi March year:',options:['1929','1930','1931','1932'],answer:'B',explanation:'Gandhi led Dandi Salt March in 1930.',time:20},
+        {id:'Hist4',chapter:'Rise of Nationalism Europe',type:'TF',difficulty:'Easy',question:'Giuseppe Garibaldi unified Italy.',options:['True','False'],answer:'A',explanation:'Garibaldi and Cavour unified Italy in 1861.',time:20},
+        {id:'Hist5',chapter:'Globalisation',type:'MCQ',difficulty:'Easy',question:'Corn Laws were repealed in Britain in:',options:['1846','1850','1860','1832'],answer:'A',explanation:'Corn Laws abolished 1846, promoting free trade.',time:25},
+        {id:'Hist6',chapter:'Print Culture',type:'MCQ',difficulty:'Easy',question:'Gutenberg invented the printing press around:',options:['1450','1550','1350','1650'],answer:'A',explanation:'Gutenberg developed movable type press around 1450.',time:25},
+        {id:'Hist7',chapter:'Industrialisation',type:'MCQ',difficulty:'Easy',question:'Industrial Revolution first began in:',options:['France','USA','Britain','Germany'],answer:'C',explanation:'Industrial Revolution started in Britain in 18th century.',time:20},
+        {id:'Hist8',chapter:'Nationalism in India',type:'MCQ',difficulty:'Medium',question:'Quit India Movement launched in:',options:['1940','1942','1944','1946'],answer:'B',explanation:'Quit India Movement: 8 August 1942.',time:25},
+        {id:'Hist9',chapter:'French Revolution',type:'MCQ',difficulty:'Easy',question:'Declaration of the Rights of Man was adopted in:',options:['1789','1791','1793','1799'],answer:'A',explanation:'Declaration adopted by National Assembly in 1789.',time:25},
+        {id:'Hist10',chapter:'Rise of Nationalism Europe',type:'MCQ',difficulty:'Easy',question:'Bismarck unified:',options:['France','Italy','Germany','Russia'],answer:'C',explanation:'Otto von Bismarck unified Germany in 1871.',time:20},
+      ],
+      'Geography':[
+        {id:'Geo1',chapter:'Resources',type:'MCQ',difficulty:'Easy',question:'Natural resources are:',options:['Man-made','Found in nature','Both','Neither'],answer:'B',explanation:'Natural resources exist in nature — soil, water, forests.',time:20},
+        {id:'Geo2',chapter:'Agriculture',type:'MCQ',difficulty:'Easy',question:'Largest wheat producing state in India:',options:['UP','Punjab','Haryana','MP'],answer:'A',explanation:'Uttar Pradesh produces the most wheat in India.',time:25},
+        {id:'Geo3',chapter:'Water Resources',type:'MCQ',difficulty:'Easy',question:'Freshwater percentage on Earth is approximately:',options:['71%','3%','29%','50%'],answer:'B',explanation:'Only ~3% of Earth\'s water is fresh.',time:25},
+        {id:'Geo4',chapter:'Minerals',type:'MCQ',difficulty:'Easy',question:'Jharia coalfield is in:',options:['Odisha','Jharkhand','Chhattisgarh','Bengal'],answer:'B',explanation:'Jharia in Jharkhand has India\'s largest coalfield.',time:25},
+        {id:'Geo5',chapter:'Industries',type:'MCQ',difficulty:'Easy',question:'Silicon Valley of India:',options:['Mumbai','Chennai','Bengaluru','Hyderabad'],answer:'C',explanation:'Bengaluru is called India\'s Silicon Valley.',time:20},
+        {id:'Geo6',chapter:'Lifelines',type:'MCQ',difficulty:'Easy',question:'Longest National Highway in India (old numbering) was NH:',options:['NH1','NH7','NH44','NH2'],answer:'B',explanation:'NH7 (now NH44) from Varanasi to Kanyakumari was longest.',time:25},
+        {id:'Geo7',chapter:'Agriculture',type:'TF',difficulty:'Easy',question:'India is the largest producer of milk in the world.',options:['True','False'],answer:'A',explanation:'India is world\'s largest milk producer.',time:20},
+        {id:'Geo8',chapter:'Resources',type:'MCQ',difficulty:'Medium',question:'Sustainable development means:',options:['Using resources freely','Meeting present needs without harming future','Only industrial growth','Banning resource use'],answer:'B',explanation:'Sustainable development balances present and future needs.',time:35},
+        {id:'Geo9',chapter:'Minerals',type:'MCQ',difficulty:'Easy',question:'Iron ore is found in Jharkhand, Odisha and:',options:['Kerala','Goa','Chhattisgarh','Rajasthan'],answer:'C',explanation:'Chhattisgarh (Bailadila) is a major iron ore region.',time:25},
+        {id:'Geo10',chapter:'Water Resources',type:'MCQ',difficulty:'Easy',question:'Bhakra Nangal Dam is on which river?',options:['Indus','Sutlej','Beas','Chenab'],answer:'B',explanation:'Bhakra Nangal Dam is on river Sutlej in Himachal.',time:25},
+      ],
+      'English':[
+        {id:'EE1',chapter:'Literature',type:'MCQ',difficulty:'Easy',question:"Author of 'Two Stories About Flying':",options:['R.K. Narayan','Liam O\'Flaherty','Premchand','Tagore'],answer:'B',explanation:"Liam O'Flaherty wrote 'The Black Gull' (First Flight).",time:25},
+        {id:'EE2',chapter:'Grammar',type:'MCQ',difficulty:'Easy',question:"'He has been working for 3 hours.' Tense?",options:['Simple Present','Present Perfect Continuous','Past Perfect','Present Continuous'],answer:'B',explanation:'Has been + Ving = Present Perfect Continuous.',time:25},
+        {id:'EE3',chapter:'Grammar',type:'MCQ',difficulty:'Easy',question:"Passive voice: 'The letter was written by Sita.'",options:['Active','Passive','Both','Neither'],answer:'B',explanation:'Was + past participle = passive.',time:20},
+        {id:'EE4',chapter:'Vocabulary',type:'MCQ',difficulty:'Easy',question:"Antonym of 'Ancient':",options:['Old','Historic','Modern','Aged'],answer:'C',explanation:"Modern is opposite of Ancient.",time:15},
+        {id:'EE5',chapter:'Grammar',type:'MCQ',difficulty:'Medium',question:'A complex sentence contains:',options:['Two independent clauses','One independent + one dependent clause','No verb','Two subjects'],answer:'B',explanation:'Complex = one main clause + one subordinate clause.',time:25},
+        {id:'EE6',chapter:'Writing',type:'MCQ',difficulty:'Easy',question:'A formal letter always includes:',options:['Nickname','Address and date','Emoticons','Slang'],answer:'B',explanation:'Formal letters need sender address, date, salutation, signature.',time:20},
+        {id:'EE7',chapter:'Literature',type:'MCQ',difficulty:'Easy',question:"Theme of 'The Sermon at Benares':",options:['War','Death and acceptance','Love','Adventure'],answer:'B',explanation:"The Buddha's sermon addresses dealing with death.",time:25},
+        {id:'EE8',chapter:'Grammar',type:'TF',difficulty:'Easy',question:"'Between' is for 2 items; 'among' for 3+.",options:['True','False'],answer:'A',explanation:'Between = two; among = three or more.',time:20},
+        {id:'EE9',chapter:'Vocabulary',type:'MCQ',difficulty:'Easy',question:"Synonym of 'Enormous':",options:['Tiny','Huge','Average','Slim'],answer:'B',explanation:"Enormous = very large = Huge.",time:15},
+        {id:'EE10',chapter:'Grammar',type:'MCQ',difficulty:'Easy',question:"'Unless you study, you ___ fail.' Fill in:",options:['will','would','might','shall'],answer:'A',explanation:"Unless + present, future with 'will'.",time:20},
+      ],
+    }
+  },
+  senior_science:{
+    subjects:{
+      'Physics':   {color:'#1D4ED8',light:'#EFF6FF',icon:'⚛️'},
+      'Chemistry': {color:'#7C3AED',light:'#FAF5FF',icon:'🧪'},
+      'Biology':   {color:'#15803D',light:'#F0FDF4',icon:'🧬'},
+      'Mathematics':{color:'#2563EB',light:'#EFF6FF',icon:'📐'},
+      'English':   {color:'#9333EA',light:'#FAF5FF',icon:'📖'},
+    },
+    questions:{
+      'Physics':[
+        {id:'Ph1',chapter:'Laws of Motion',type:'MCQ',difficulty:'Easy',question:"Newton's 1st law is also called:",options:['Law of inertia','Law of momentum','Law of gravity','Law of force'],answer:'A',explanation:"Newton's 1st law = Law of Inertia.",time:25},
+        {id:'Ph2',chapter:'Gravitation',type:'MCQ',difficulty:'Easy',question:'Value of g on Earth surface ≈',options:['9.8 m/s²','8.9 m/s²','10.8 m/s²','9.1 m/s²'],answer:'A',explanation:'g ≈ 9.8 m/s² (or 10 m/s² approximately).',time:20},
+        {id:'Ph3',chapter:'Work & Energy',type:'MCQ',difficulty:'Easy',question:'Work = Force × ___',options:['Time','Mass','Displacement','Velocity'],answer:'C',explanation:'W = F × d × cosθ.',time:20},
+        {id:'Ph4',chapter:'Waves',type:'MCQ',difficulty:'Easy',question:'Sound travels fastest through:',options:['Air','Water','Vacuum','Steel'],answer:'D',explanation:'Sound travels fastest in solids due to close packing.',time:25},
+        {id:'Ph5',chapter:'Current Electricity',type:'MCQ',difficulty:'Easy',question:"Ohm's law: V = IR. Unit of resistance:",options:['Volt','Ampere','Ohm','Watt'],answer:'C',explanation:'Resistance is measured in Ohms (Ω).',time:20},
+        {id:'Ph6',chapter:'Electromagnetic Induction',type:'MCQ',difficulty:'Medium',question:"Faraday's law states EMF ∝",options:['Current','Charge','Rate of change of flux','Resistance'],answer:'C',explanation:'EMF = −dΦ/dt (Faraday\'s law).',time:30},
+        {id:'Ph7',chapter:'Optics',type:'MCQ',difficulty:'Easy',question:'Concave lens always forms a ___ image:',options:['Real, inverted','Virtual, erect','Real, erect','Virtual, inverted'],answer:'B',explanation:'Concave lenses form virtual, erect, diminished images.',time:25},
+        {id:'Ph8',chapter:'Thermodynamics',type:'MCQ',difficulty:'Medium',question:'1st Law of Thermodynamics states:',options:['Entropy increases','Energy is conserved','Heat flows cold→hot','Entropy = 0 at 0 K'],answer:'B',explanation:'First Law: Energy cannot be created or destroyed.',time:30},
+        {id:'Ph9',chapter:'Nuclear Physics',type:'MCQ',difficulty:'Easy',question:'Radioactive decay is independent of:',options:['Temperature','Pressure','Both T and P','Nucleus type'],answer:'C',explanation:'Radioactive decay rate depends only on nucleus, not T or P.',time:25},
+        {id:'Ph10',chapter:'Semiconductor Electronics',type:'MCQ',difficulty:'Easy',question:'p-n junction in forward bias:',options:['Conducts','Does not conduct','Acts as capacitor','Acts as inductor'],answer:'A',explanation:'Forward biased p-n junction allows current flow.',time:25},
+      ],
+      'Chemistry':[
+        {id:'Ch1',chapter:'Atomic Structure',type:'MCQ',difficulty:'Easy',question:'Atomic number = number of:',options:['Neutrons','Protons','Electrons+Protons','Nucleons'],answer:'B',explanation:'Atomic number Z = number of protons.',time:20},
+        {id:'Ch2',chapter:'Periodic Table',type:'MCQ',difficulty:'Easy',question:'Periods in Modern Periodic Table:',options:['5','6','7','8'],answer:'C',explanation:'There are 7 periods in the modern periodic table.',time:20},
+        {id:'Ch3',chapter:'Chemical Bonding',type:'MCQ',difficulty:'Easy',question:'NaCl bond type:',options:['Covalent','Ionic','Metallic','Hydrogen'],answer:'B',explanation:'NaCl is ionic (Na⁺Cl⁻).',time:20},
+        {id:'Ch4',chapter:'Thermodynamics',type:'MCQ',difficulty:'Medium',question:'Exothermic reaction: ΔH is:',options:['Positive','Negative','Zero','Undefined'],answer:'B',explanation:'Exothermic reactions have ΔH < 0 (release heat).',time:30},
+        {id:'Ch5',chapter:'Equilibrium',type:'MCQ',difficulty:'Medium',question:"Le Chatelier's principle: increasing pressure shifts equilibrium towards:",options:['Fewer moles gas','More moles gas','No change','Products always'],answer:'A',explanation:'Increased pressure favours side with fewer gas moles.',time:35},
+        {id:'Ch6',chapter:'Electrochemistry',type:'MCQ',difficulty:'Easy',question:'Oxidation involves:',options:['Gain of electrons','Loss of electrons','Gain of protons','Loss of protons'],answer:'B',explanation:'Oxidation = loss of electrons (OIL in OILRIG).',time:25},
+        {id:'Ch7',chapter:'Coordination Chemistry',type:'MCQ',difficulty:'Medium',question:'EDTA is a ___ dentate ligand:',options:['Mono','Bi','Tetra','Hexa'],answer:'D',explanation:'EDTA has 6 donor atoms — hexadentate.',time:30},
+        {id:'Ch8',chapter:'Alcohols & Ethers',type:'MCQ',difficulty:'Easy',question:'IUPAC name of CH₃OH:',options:['Ethanol','Methanol','Propanol','Butanol'],answer:'B',explanation:'CH₃OH = Methanol (1 carbon).',time:25},
+        {id:'Ch9',chapter:'Polymers',type:'MCQ',difficulty:'Easy',question:'Nylon is a:',options:['Polyester','Polyamide','Polyethylene','Polystyrene'],answer:'B',explanation:'Nylon is a polyamide made from amide linkages.',time:25},
+        {id:'Ch10',chapter:'Biomolecules',type:'MCQ',difficulty:'Easy',question:'DNA double helix model: Watson & Crick, year:',options:['1950','1953','1956','1960'],answer:'B',explanation:'Watson and Crick proposed DNA double helix in 1953.',time:25},
+      ],
+      'Biology':[
+        {id:'Bio1',chapter:'Cell Biology',type:'MCQ',difficulty:'Easy',question:'Cell theory was given by:',options:['Darwin','Schleiden & Schwann','Mendel','Watson'],answer:'B',explanation:'Cell theory: Schleiden (1838) and Schwann (1839).',time:25},
+        {id:'Bio2',chapter:'Biomolecules',type:'MCQ',difficulty:'Easy',question:'Enzyme are made of:',options:['Lipids','Carbohydrates','Proteins','Nucleic acids'],answer:'C',explanation:'Enzymes are biological catalysts made of proteins.',time:20},
+        {id:'Bio3',chapter:'Photosynthesis',type:'MCQ',difficulty:'Easy',question:'Site of light reactions in chloroplast:',options:['Stroma','Thylakoid membrane','Outer membrane','Matrix'],answer:'B',explanation:'Light reactions occur in thylakoid membranes.',time:25},
+        {id:'Bio4',chapter:'Respiration',type:'MCQ',difficulty:'Easy',question:'End products of glycolysis are:',options:['CO₂ + H₂O','Pyruvate + ATP','Glucose + O₂','Acetyl CoA'],answer:'B',explanation:'Glycolysis converts glucose → 2 pyruvate + 2 ATP.',time:25},
+        {id:'Bio5',chapter:'Plant Kingdom',type:'MCQ',difficulty:'Easy',question:'Bryophytes are called:',options:['Vascular plants','Amphibians of plant kingdom','Seed plants','Algae'],answer:'B',explanation:'Bryophytes need water for reproduction — plant amphibians.',time:25},
+        {id:'Bio6',chapter:'Animal Kingdom',type:'MCQ',difficulty:'Easy',question:'Insects belong to phylum:',options:['Mollusca','Annelida','Arthropoda','Chordata'],answer:'C',explanation:'Insects are arthropods — exoskeleton, jointed appendages.',time:20},
+        {id:'Bio7',chapter:'Genetics',type:'MCQ',difficulty:'Medium',question:"Mendel's Law of Segregation states:",options:['Genes blend','Alleles separate during gamete formation','All traits are linked','Chromosomes are proteins'],answer:'B',explanation:'Alleles separate (segregate) during gamete formation.',time:30},
+        {id:'Bio8',chapter:'Evolution',type:'MCQ',difficulty:'Easy',question:"Darwin's theory of evolution involves:",options:['Lamarckism','Natural selection','Special creation','Mutation only'],answer:'B',explanation:"Darwin's Natural Selection: survival of the fittest.",time:25},
+        {id:'Bio9',chapter:'Human Physiology',type:'MCQ',difficulty:'Easy',question:'Insulin is secreted by:',options:['Liver','Pancreas','Kidney','Thyroid'],answer:'B',explanation:'Islets of Langerhans in pancreas secrete insulin.',time:20},
+        {id:'Bio10',chapter:'Biotechnology',type:'MCQ',difficulty:'Medium',question:'PCR is used to:',options:['Sequence DNA','Amplify DNA','Edit genes','Join DNA fragments'],answer:'B',explanation:'Polymerase Chain Reaction amplifies specific DNA sequences.',time:25},
+      ],
+      'Mathematics':[
+        {id:'HM1',chapter:'Relations & Functions',type:'MCQ',difficulty:'Easy',question:'A function f: A→B is one-one if:',options:['f(a)=f(b) implies a≠b','f(a)=f(b) implies a=b','Every b has a preimage','Range = codomain'],answer:'B',explanation:'One-one (injective): f(a)=f(b) ⟹ a=b.',time:30},
+        {id:'HM2',chapter:'Matrices',type:'MCQ',difficulty:'Easy',question:'Order of matrix with 2 rows and 3 columns:',options:['3×2','2×3','6×1','1×6'],answer:'B',explanation:'Order = rows × columns = 2×3.',time:20},
+        {id:'HM3',chapter:'Determinants',type:'MCQ',difficulty:'Medium',question:'det[[1,2],[3,4]] = ?',options:['2','-2','10','-10'],answer:'B',explanation:'(1×4)−(2×3) = 4−6 = −2.',time:25},
+        {id:'HM4',chapter:'Calculus',type:'MCQ',difficulty:'Easy',question:'d/dx(xⁿ) = ?',options:['xⁿ⁻¹','nxⁿ','nxⁿ⁻¹','nxⁿ⁺¹'],answer:'C',explanation:'Power rule: d/dx(xⁿ) = nxⁿ⁻¹.',time:25},
+        {id:'HM5',chapter:'Calculus',type:'MCQ',difficulty:'Easy',question:'∫xⁿ dx (n≠−1) = ?',options:['xⁿ⁺¹','xⁿ⁺¹/(n+1)+C','nxⁿ⁻¹','xⁿ/n+C'],answer:'B',explanation:'∫xⁿdx = xⁿ⁺¹/(n+1) + C.',time:25},
+        {id:'HM6',chapter:'Probability',type:'MCQ',difficulty:'Medium',question:'Bayes theorem relates:',options:['Mean and variance','Conditional probabilities','Events and outcomes','Permutations'],answer:'B',explanation:"Bayes' theorem: P(A|B) = P(B|A)P(A)/P(B).",time:30},
+        {id:'HM7',chapter:'3D Geometry',type:'MCQ',difficulty:'Easy',question:'Direction cosines of a line satisfy l²+m²+n² = ?',options:['0','1','2','3'],answer:'B',explanation:'l²+m²+n² = 1 always for direction cosines.',time:25},
+        {id:'HM8',chapter:'Linear Programming',type:'MCQ',difficulty:'Easy',question:'Objective function in LP is:',options:['A constraint','To be optimised','An equality','Always linear'],answer:'B',explanation:'Objective function is what we maximise or minimise.',time:25},
+        {id:'HM9',chapter:'Vectors',type:'MCQ',difficulty:'Easy',question:'|a⃗ × b⃗| = ?',options:['|a||b|cosθ','|a||b|sinθ','|a|+|b|','|a|−|b|'],answer:'B',explanation:'Cross product magnitude = |a||b|sinθ.',time:25},
+        {id:'HM10',chapter:'Differential Equations',type:'MCQ',difficulty:'Medium',question:'Order of dy/dx + y = x is:',options:['0','1','2','3'],answer:'B',explanation:'Order = highest derivative order = 1.',time:25},
+      ],
+      'English':[
+        {id:'HE1',chapter:'Literature',type:'MCQ',difficulty:'Easy',question:"'The Last Lesson' is by:",options:['Guy de Maupassant','Alphonse Daudet','Flaubert','Hugo'],answer:'B',explanation:"Alphonse Daudet wrote 'The Last Lesson'.",time:25},
+        {id:'HE2',chapter:'Grammar',type:'MCQ',difficulty:'Easy',question:'Identify the gerund: He enjoys swimming.',options:['He','enjoys','swimming','—'],answer:'C',explanation:'Gerund = verb+ing used as noun. Swimming is the gerund.',time:20},
+        {id:'HE3',chapter:'Literature',type:'MCQ',difficulty:'Easy',question:"'Deep Water' is written by:",options:['William Douglas','Ernest Hemingway','Mark Twain','Steinbeck'],answer:'A',explanation:"William Douglas wrote 'Deep Water' (autobiographical).",time:25},
+        {id:'HE4',chapter:'Grammar',type:'MCQ',difficulty:'Medium',question:'Which sentence uses subjunctive mood?',options:['He runs fast.','If I were a bird, I would fly.','She is singing.','They played well.'],answer:'B',explanation:"'If I were' — subjunctive mood expresses hypothetical.",time:25},
+        {id:'HE5',chapter:'Writing',type:'MCQ',difficulty:'Easy',question:'A précis should be about ___ of original:',options:['1/4 to 1/3','1/2 to 3/4','Equal length','Twice the length'],answer:'A',explanation:'Précis = condensed version, about 1/3 of original.',time:25},
+        {id:'HE6',chapter:'Vocabulary',type:'MCQ',difficulty:'Easy',question:"Synonym of 'Ephemeral':",options:['Eternal','Temporary','Massive','Ancient'],answer:'B',explanation:"Ephemeral = lasting for a very short time = Temporary.",time:20},
+        {id:'HE7',chapter:'Literature',type:'MCQ',difficulty:'Easy',question:"'Aunt Jennifer's Tigers' is written by:",options:['Adrienne Rich','Sylvia Plath','Emily Dickinson','Toni Morrison'],answer:'A',explanation:"Adrienne Rich wrote 'Aunt Jennifer's Tigers'.",time:25},
+        {id:'HE8',chapter:'Grammar',type:'MCQ',difficulty:'Easy',question:"'To err is human.' 'To err' is:",options:['Gerund','Infinitive','Participle','Noun'],answer:'B',explanation:"'To + verb' = Infinitive. 'To err' is an infinitive.",time:20},
+        {id:'HE9',chapter:'Vocabulary',type:'MCQ',difficulty:'Easy',question:"Antonym of 'Benevolent':",options:['Kind','Generous','Malevolent','Helpful'],answer:'C',explanation:"Benevolent = kind; Malevolent = evil/harmful.",time:20},
+        {id:'HE10',chapter:'Writing',type:'MCQ',difficulty:'Easy',question:'In a debate speech, the rebuttal is:',options:['Opening argument','Response to opponent','Conclusion','Introduction'],answer:'B',explanation:'Rebuttal = counter-argument against the opposing side.',time:20},
+      ],
+    }
+  },
+  senior_commerce:{
+    subjects:{
+      'Accountancy':      {color:'#EA580C',light:'#FFF7ED',icon:'📒'},
+      'Business Studies': {color:'#1D4ED8',light:'#EFF6FF',icon:'💼'},
+      'Economics':        {color:'#D97706',light:'#FFFBEB',icon:'📊'},
+      'Mathematics':      {color:'#2563EB',light:'#EFF6FF',icon:'📐'},
+      'English':          {color:'#9333EA',light:'#FAF5FF',icon:'📖'},
+    },
+    questions:{
+      'Accountancy':[
+        {id:'Acc1',chapter:'Basics',type:'MCQ',difficulty:'Easy',question:"Accounting equation: Assets = ?",options:['Capital only','Liabilities only','Capital + Liabilities','Revenue − Expenses'],answer:'C',explanation:'Assets = Capital + Liabilities (fundamental equation).',time:25},
+        {id:'Acc2',chapter:'Basics',type:'MCQ',difficulty:'Easy',question:"Double entry: every debit has a:",options:['Equal debit','Equal credit','Unequal credit','No effect'],answer:'B',explanation:'Every debit entry has a corresponding equal credit.',time:20},
+        {id:'Acc3',chapter:'Partnership',type:'MCQ',difficulty:'Easy',question:"Goodwill on admission of partner is shared among:",options:['New partner only','Old partners only','All partners','No one'],answer:'B',explanation:'Goodwill is shared among old partners in sacrificing ratio.',time:25},
+        {id:'Acc4',chapter:'Depreciation',type:'MCQ',difficulty:'Easy',question:"SLM depreciation is calculated on:",options:['Current book value','Original cost','Market value','Replacement cost'],answer:'B',explanation:'Straight Line Method uses original cost each year.',time:25},
+        {id:'Acc5',chapter:'Financial Statements',type:'MCQ',difficulty:'Easy',question:"Gross profit = Net Sales − ?",options:['Operating expenses','COGS','Admin expenses','Interest'],answer:'B',explanation:'Gross Profit = Net Sales − Cost of Goods Sold.',time:20},
+        {id:'Acc6',chapter:'Ratios',type:'MCQ',difficulty:'Medium',question:"Current Ratio = Current Assets / ?",options:['Total Assets','Fixed Assets','Current Liabilities','Capital'],answer:'C',explanation:'Current Ratio = Current Assets / Current Liabilities.',time:25},
+        {id:'Acc7',chapter:'Cash Flow',type:'MCQ',difficulty:'Medium',question:"Purchase of machinery is ___ activity:",options:['Operating','Investing','Financing','None'],answer:'B',explanation:'Fixed asset purchase is an investing activity.',time:25},
+        {id:'Acc8',chapter:'Share Capital',type:'MCQ',difficulty:'Easy',question:"Minimum paid-up capital for a Public Ltd company:",options:['₹1 lakh','₹2 lakh','₹5 lakh','₹10 lakh'],answer:'C',explanation:'Minimum paid-up capital for public company = ₹5 lakh.',time:25},
+        {id:'Acc9',chapter:'Partnership',type:'MCQ',difficulty:'Easy',question:"In absence of partnership deed, profit is shared:",options:['Equally','In capital ratio','2:1:1','In time ratio'],answer:'A',explanation:'Without deed, profits shared equally per Partnership Act.',time:20},
+        {id:'Acc10',chapter:'Ratios',type:'MCQ',difficulty:'Medium',question:"Debt-Equity Ratio = Long-term Debt / ?",options:["Total Assets","Shareholders' Funds","Current Liabilities","Revenue"],answer:'B',explanation:"Debt-Equity = Long-term Debt / Shareholders' Funds.",time:25},
+      ],
+      'Business Studies':[
+        {id:'BS1',chapter:'Management',type:'MCQ',difficulty:'Easy',question:"Fayol's principles of management are:",options:['10','14','12','18'],answer:'B',explanation:'Henri Fayol gave 14 Principles of Management.',time:20},
+        {id:'BS2',chapter:'Planning',type:'MCQ',difficulty:'Easy',question:"Planning is primarily concerned with:",options:['Past','Present','Future','All'],answer:'C',explanation:'Planning involves deciding future course of action.',time:20},
+        {id:'BS3',chapter:'Organising',type:'MCQ',difficulty:'Easy',question:"Span of management refers to:",options:['Number of subordinates','Levels of hierarchy','Delegation range','None'],answer:'A',explanation:'Span = number of subordinates a manager can supervise.',time:25},
+        {id:'BS4',chapter:'Directing',type:'MCQ',difficulty:'Easy',question:"Motivation theory — Maslow's hierarchy has ___ levels:",options:['3','4','5','6'],answer:'C',explanation:"Maslow's hierarchy: 5 levels from physiological to self-actualization.",time:20},
+        {id:'BS5',chapter:'Controlling',type:'MCQ',difficulty:'Easy',question:"MBO stands for:",options:['Management By Objectives','Marketing By Operations','Managing Business Operations','None'],answer:'A',explanation:'MBO = Management By Objectives (Peter Drucker).',time:20},
+        {id:'BS6',chapter:'Finance',type:'MCQ',difficulty:'Easy',question:"Working capital = Current Assets − ?",options:['Fixed Assets','Current Liabilities','Reserves','Long-term debt'],answer:'B',explanation:'Working Capital = Current Assets − Current Liabilities.',time:20},
+        {id:'BS7',chapter:'Marketing',type:'MCQ',difficulty:'Easy',question:"4Ps of marketing include Price, Product, Place and:",options:['People','Promotion','Performance','Profit'],answer:'B',explanation:"4Ps: Product, Price, Place, Promotion.",time:20},
+        {id:'BS8',chapter:'Consumer Protection',type:'MCQ',difficulty:'Easy',question:"Consumer Protection Act was enacted in India in:",options:['1986','1990','1994','1999'],answer:'A',explanation:'Consumer Protection Act enacted in 1986.',time:20},
+        {id:'BS9',chapter:'Business Environment',type:'MCQ',difficulty:'Easy',question:"LPG policy stands for:",options:['LPG Gas Policy','Liberalisation, Privatisation, Globalisation','Long-term Planning Goal','None'],answer:'B',explanation:'LPG = Liberalisation, Privatisation, Globalisation (1991).',time:20},
+        {id:'BS10',chapter:'Management',type:'TF',difficulty:'Easy',question:"Management is both a science and an art.",options:['True','False'],answer:'A',explanation:'Management has principles (science) and requires skill (art).',time:20},
+      ],
+      'Economics':[
+        {id:'Eco1',chapter:'Microeconomics',type:'MCQ',difficulty:'Easy',question:"Law of Demand states price and demand are:",options:['Directly related','Inversely related','Unrelated','Same'],answer:'B',explanation:'Price ↑ → Demand ↓ (inverse relation).',time:20},
+        {id:'Eco2',chapter:'Microeconomics',type:'MCQ',difficulty:'Easy',question:"Elasticity of demand = % change in quantity / ?",options:['% change in price','% change in income','% change in supply','% change in cost'],answer:'A',explanation:'Price Elasticity of Demand = %ΔQ / %ΔP.',time:25},
+        {id:'Eco3',chapter:'Macroeconomics',type:'MCQ',difficulty:'Easy',question:"GDP stands for:",options:['Gross Domestic Product','Grand Development Plan','General Data Processing','None'],answer:'A',explanation:'GDP = Gross Domestic Product.',time:15},
+        {id:'Eco4',chapter:'National Income',type:'MCQ',difficulty:'Easy',question:"NNP = GNP − ?",options:['Taxes','Depreciation','Transfer payments','Subsidies'],answer:'B',explanation:'NNP = GNP − Depreciation (consumption of fixed capital).',time:25},
+        {id:'Eco5',chapter:'Money',type:'MCQ',difficulty:'Easy',question:"Primary function of money:",options:['Store of value','Standard of deferred payment','Medium of exchange','Measure of value'],answer:'C',explanation:'Primary function of money is medium of exchange.',time:20},
+        {id:'Eco6',chapter:'Banking',type:'MCQ',difficulty:'Easy',question:"RBI was established in:",options:['1934','1935','1947','1950'],answer:'B',explanation:'Reserve Bank of India established on 1 April 1935.',time:20},
+        {id:'Eco7',chapter:'Statistics',type:'MCQ',difficulty:'Easy',question:"Arithmetic Mean of 10, 20, 30 =",options:['20','25','15','30'],answer:'A',explanation:'Mean = (10+20+30)/3 = 60/3 = 20.',time:20},
+        {id:'Eco8',chapter:'Statistics',type:'MCQ',difficulty:'Easy',question:"Standard deviation measures:",options:['Central tendency','Dispersion','Correlation','Regression'],answer:'B',explanation:'Standard deviation measures spread/dispersion of data.',time:20},
+        {id:'Eco9',chapter:'Macroeconomics',type:'MCQ',difficulty:'Medium',question:"Government budget deficit occurs when:",options:['Revenue > Expenditure','Expenditure > Revenue','Both equal','GDP falls'],answer:'B',explanation:'Budget deficit: Expenditure > Revenue.',time:25},
+        {id:'Eco10',chapter:'Microeconomics',type:'MCQ',difficulty:'Medium',question:"Break-even point is where TR = ?",options:['TR > TC','TC','TR + TC','TR − TC'],answer:'B',explanation:'Break-even: Total Revenue = Total Cost (zero profit).',time:25},
+      ],
+      'Mathematics':null,
+      'English':null,
+    }
+  },
+  senior_arts:{
+    subjects:{
+      'History':          {color:'#92400E',light:'#FFFBEB',icon:'🏛️'},
+      'Political Science':{color:'#1D4ED8',light:'#EFF6FF',icon:'⚖️'},
+      'Geography':        {color:'#0891B2',light:'#ECFEFF',icon:'🌍'},
+      'Sociology':        {color:'#5B21B6',light:'#F5F3FF',icon:'👥'},
+      'Economics':        {color:'#D97706',light:'#FFFBEB',icon:'📊'},
+    },
+    questions:{
+      'History':[
+        {id:'AH1',chapter:'Harappan Civilisation',type:'MCQ',difficulty:'Easy',question:"Harappan Civilisation is also known as:",options:['Vedic','Indus Valley','Gangetic','Deccan'],answer:'B',explanation:'Harappan/Indus Valley Civilisation (3300–1300 BCE).',time:25},
+        {id:'AH2',chapter:'Mauryan Empire',type:'MCQ',difficulty:'Easy',question:"Ashokan edicts are written in:",options:['Sanskrit','Pali/Prakrit','Tamil','Persian'],answer:'B',explanation:'Ashoka inscribed edicts in Pali/Brahmi script.',time:25},
+        {id:'AH3',chapter:'Bhakti Tradition',type:'MCQ',difficulty:'Easy',question:"Kabir was a disciple of:",options:['Shankaracharya','Ramananda','Chaitanya','Tukaram'],answer:'B',explanation:'Kabir was a disciple of the saint Ramananda.',time:25},
+        {id:'AH4',chapter:'Vijayanagara',type:'MCQ',difficulty:'Easy',question:"Hampi was capital of:",options:['Chola','Pallava','Vijayanagara','Hoysala'],answer:'C',explanation:'Hampi was the capital of Vijayanagara Empire.',time:20},
+        {id:'AH5',chapter:'Mughal Empire',type:'MCQ',difficulty:'Easy',question:"Akbar's court historian:",options:['Abul Fazl','Faizi','Birbal','Todar Mal'],answer:'A',explanation:"Abul Fazl wrote Akbarnama and Ain-i-Akbari.",time:25},
+        {id:'AH6',chapter:'British India',type:'MCQ',difficulty:'Easy',question:"Bengal Partition year:",options:['1903','1905','1907','1911'],answer:'B',explanation:'Lord Curzon partitioned Bengal in 1905.',time:20},
+        {id:'AH7',chapter:'Nationalist Movement',type:'MCQ',difficulty:'Easy',question:"Champaran Satyagraha year:",options:['1915','1917','1919','1920'],answer:'B',explanation:'Gandhi led Champaran Satyagraha in 1917.',time:20},
+        {id:'AH8',chapter:'Framing Constitution',type:'MCQ',difficulty:'Easy',question:"Constituent Assembly adopted Constitution on:",options:['15 Aug 1947','26 Jan 1950','26 Nov 1949','2 Oct 1947'],answer:'C',explanation:'Constitution adopted on 26 November 1949.',time:25},
+        {id:'AH9',chapter:'Harappan Civilisation',type:'TF',difficulty:'Easy',question:"The Great Bath is located at Mohenjo-daro.",options:['True','False'],answer:'A',explanation:'The Great Bath, a large public bathing facility, is at Mohenjo-daro.',time:20},
+        {id:'AH10',chapter:'Mughal Empire',type:'MCQ',difficulty:'Easy',question:"Taj Mahal was built by:",options:['Akbar','Jahangir','Shah Jahan','Aurangzeb'],answer:'C',explanation:'Shah Jahan built Taj Mahal in memory of Mumtaz Mahal.',time:20},
+      ],
+      'Political Science':[
+        {id:'PS1',chapter:'Constitution',type:'MCQ',difficulty:'Easy',question:"Preamble of Indian Constitution begins with:",options:['We the People','We the Citizens','The People of India','Sovereign People'],answer:'A',explanation:"Preamble: 'We the People of India...'",time:20},
+        {id:'PS2',chapter:'Rights',type:'MCQ',difficulty:'Easy',question:"Right to Education became a Fundamental Right in:",options:['2002','2004','2009','2010'],answer:'C',explanation:'RTE Act 2009 made education a fundamental right (86th amendment).',time:25},
+        {id:'PS3',chapter:'Legislature',type:'MCQ',difficulty:'Easy',question:"Rajya Sabha members serve for how many years?",options:['4','5','6','7'],answer:'C',explanation:'Rajya Sabha members serve 6-year terms.',time:20},
+        {id:'PS4',chapter:'Executive',type:'MCQ',difficulty:'Easy',question:"President of India elected by:",options:['Lok Sabha only','All citizens','Elected MPs + MLAs','Rajya Sabha only'],answer:'C',explanation:'President elected by elected members of Parliament and State Assemblies.',time:25},
+        {id:'PS5',chapter:'Judiciary',type:'MCQ',difficulty:'Easy',question:"Chief Justice of India is appointed by:",options:['Prime Minister','President','Parliament','Council of Ministers'],answer:'B',explanation:'President appoints Chief Justice on advice of outgoing CJI.',time:20},
+        {id:'PS6',chapter:'Federalism',type:'MCQ',difficulty:'Easy',question:"Subjects in Concurrent List governed by:",options:['Centre only','State only','Both Centre and State','Local bodies'],answer:'C',explanation:'Concurrent List subjects: both Centre and State can legislate.',time:20},
+        {id:'PS7',chapter:'Election',type:'MCQ',difficulty:'Easy',question:"Election Commission of India is:",options:['Constitutional body','Parliamentary body','Executive body','Judicial body'],answer:'A',explanation:'ECI is an autonomous constitutional body.',time:20},
+        {id:'PS8',chapter:'Local Government',type:'MCQ',difficulty:'Easy',question:"73rd Constitutional Amendment relates to:",options:['Urban bodies','Panchayati Raj','Fundamental Rights','Directive Principles'],answer:'B',explanation:'73rd Amendment (1992) gave constitutional status to Panchayati Raj.',time:25},
+        {id:'PS9',chapter:'Freedom',type:'MCQ',difficulty:'Easy',question:"Freedom of press in India is part of:",options:['Article 19(1)(a)','Article 21','Article 14','Article 32'],answer:'A',explanation:'Freedom of speech & expression (Article 19(1)(a)) includes press freedom.',time:25},
+        {id:'PS10',chapter:'Rights',type:'TF',difficulty:'Easy',question:"Directive Principles of State Policy are justiciable.",options:['True','False'],answer:'B',explanation:'DPSPs are non-justiciable — they cannot be enforced in courts.',time:20},
+      ],
+      'Geography':null,
+      'Sociology':[
+        {id:'Soc1',chapter:'Sociology Introduction',type:'MCQ',difficulty:'Easy',question:"Father of Sociology:",options:['Karl Marx','Max Weber','Auguste Comte','Durkheim'],answer:'C',explanation:"Auguste Comte coined 'Sociology' and is its founding father.",time:25},
+        {id:'Soc2',chapter:'Social Institutions',type:'MCQ',difficulty:'Easy',question:"Family is a ___ institution:",options:['Political','Economic','Social/Primary','Legal'],answer:'C',explanation:'Family is the primary social institution.',time:20},
+        {id:'Soc3',chapter:'Social Stratification',type:'MCQ',difficulty:'Easy',question:"Caste system in India is based on:",options:['Achievement','Birth','Wealth','Education'],answer:'B',explanation:'Caste status is ascribed at birth, not achieved.',time:20},
+        {id:'Soc4',chapter:'Culture',type:'MCQ',difficulty:'Easy',question:"Norms are:",options:['Laws of physics','Expected behaviour patterns','Scientific theories','Government policies'],answer:'B',explanation:'Norms are shared social rules/expected behaviour.',time:20},
+        {id:'Soc5',chapter:'Social Change',type:'MCQ',difficulty:'Easy',question:"Industrial Revolution led to:",options:['Decline of cities','Rise of urbanisation','End of trade','Agricultural boom'],answer:'B',explanation:'Industrialisation caused mass urbanisation.',time:20},
+        {id:'Soc6',chapter:'Social Stratification',type:'MCQ',difficulty:'Medium',question:"Weber's three dimensions of stratification are:",options:['Class, Status, Party','Race, Gender, Age','Education, Income, Caste','Religion, Language, Region'],answer:'A',explanation:'Max Weber: Class (economic), Status (prestige), Party (power).',time:30},
+        {id:'Soc7',chapter:'Sociology Introduction',type:'MCQ',difficulty:'Easy',question:"Sociological imagination concept by:",options:['Durkheim','C. Wright Mills','Parsons','Merton'],answer:'B',explanation:"C. Wright Mills introduced 'Sociological Imagination' (1959).",time:25},
+        {id:'Soc8',chapter:'Social Institutions',type:'TF',difficulty:'Easy',question:"Education is an agent of socialisation.",options:['True','False'],answer:'A',explanation:'Schools transmit culture, values and norms — secondary socialisation.',time:20},
+        {id:'Soc9',chapter:'Culture',type:'MCQ',difficulty:'Easy',question:"Material culture includes:",options:['Values','Norms','Tools and technology','Beliefs'],answer:'C',explanation:'Material culture: physical objects — tools, buildings, tech.',time:20},
+        {id:'Soc10',chapter:'Social Change',type:'MCQ',difficulty:'Easy',question:"Globalisation primarily refers to:",options:['Spread of global warming','Integration of world economies and cultures','Formation of UN','None'],answer:'B',explanation:'Globalisation = economic, cultural and political integration globally.',time:20},
+      ],
+      'Economics':null,
+    }
+  }
+};
+
+/* Share question banks across groups */
+GRADE_SUBJECTS.senior_commerce.questions.Mathematics = GRADE_SUBJECTS.senior_science.questions.Mathematics;
+GRADE_SUBJECTS.senior_commerce.questions.English = GRADE_SUBJECTS.senior_science.questions.English;
+GRADE_SUBJECTS.senior_arts.questions.Geography = GRADE_SUBJECTS.secondary.questions.Geography;
+GRADE_SUBJECTS.senior_arts.questions.Economics = GRADE_SUBJECTS.senior_commerce.questions.Economics;
+
+const GRADE_META = {
+  1:{group:'primary',label:'Class 1'},2:{group:'primary',label:'Class 2'},3:{group:'primary',label:'Class 3'},
+  4:{group:'primary',label:'Class 4'},5:{group:'primary',label:'Class 5'},
+  6:{group:'middle',label:'Class 6'},7:{group:'middle',label:'Class 7'},8:{group:'middle',label:'Class 8'},
+  9:{group:'secondary',label:'Class 9'},10:{group:'secondary',label:'Class 10'},
+  11:{group:'senior',label:'Class 11'},12:{group:'senior',label:'Class 12'},
+};
+const STREAMS = [
+  {id:'science', label:'Science', icon:'⚛️', sub:'Phy · Chem · Bio · Math', group:'senior_science'},
+  {id:'commerce',label:'Commerce',icon:'💼',sub:'Acc · BSt · Eco · Math', group:'senior_commerce'},
+  {id:'arts',    label:'Arts',    icon:'🎨',sub:'Hist · PolSci · Geo · Soc', group:'senior_arts'},
+];
+
+/* ════════════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════════ */
+let STATE = {
+  user: null,
+  grade: null,
+  stream: null,
+  subjectGroup: null,
+  stats: {},          // { subjectName: {attempted, totalCorrect, totalQ} }
+  streak: 0,
+  // quiz
+  curSubject: null,
+  curQuestions: [],
+  curAnswers: [],
+  curIdx: 0,
+  quizFilter: {chapter:'All',difficulty:'All',type:'All',count:10},
+  timerRef: null,
+  timeLeft: 30,
+  lastResult: null,
+  authMode: 'login',
+};
+
+/* ════════════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════════ */
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a; }
+function getGrade(pct){ if(pct>=90)return{l:'A+',c:'#16A34A'};if(pct>=75)return{l:'A',c:'#2563EB'};if(pct>=60)return{l:'B',c:'#F97316'};if(pct>=40)return{l:'C',c:'#D97706'};return{l:'D',c:'#DC2626'}; }
+function subjectData(){ return GRADE_SUBJECTS[STATE.subjectGroup]; }
+function getQs(subj){ const d=subjectData(); return (d&&d.questions&&d.questions[subj])||[]; }
+function getSubjects(){ const d=subjectData(); return d?Object.entries(d.subjects||{}):[]; }
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  const el=document.getElementById(id);
+  if(el){el.classList.add('on');}
+  // update bnav
+  document.querySelectorAll('.bnav-item').forEach(b=>b.classList.remove('on'));
+  const nb=document.getElementById('nav-'+id);
+  if(nb)nb.classList.add('on');
+  // hide bnav on quiz
+  document.getElementById('bnav').style.display = id==='quiz'?'none':'flex';
+}
+
+/* ════════════════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════════════════ */
+function setAuthMode(m){
+  STATE.authMode=m;
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('on',(i===0&&m==='login')||(i===1&&m==='signup')));
+  document.getElementById('a-name').style.display=m==='signup'?'block':'none';
+  document.getElementById('a-btn-txt').textContent=m==='login'?'Sign In →':'Create Account →';
+  document.getElementById('a-switch').innerHTML=m==='login'?'New here? <span onclick="setAuthMode(\'signup\')">Sign up free</span>':'Already have one? <span onclick="setAuthMode(\'login\')">Sign in</span>';
+  document.getElementById('a-err').textContent='';
+}
+function doAuth(){
+  const email=document.getElementById('a-email').value.trim();
+  const pass=document.getElementById('a-pass').value.trim();
+  if(!email||!pass){document.getElementById('a-err').textContent='Please fill all fields.';return;}
+  const name=STATE.authMode==='signup'?document.getElementById('a-name').value.trim():email.split('@')[0];
+  STATE.user={name:name||email.split('@')[0],email};
+  STATE.streak=Math.floor(Math.random()*8);
+  document.getElementById('auth').classList.remove('on');
+  document.getElementById('main-app').style.display='block';
+  document.getElementById('tb-avatar').textContent=STATE.user.name[0].toUpperCase();
+  buildGradeScreen();
+}
+
+/* ════════════════════════════════════════════════════════
+   GRADE SELECT
+════════════════════════════════════════════════════════ */
+function buildGradeScreen(){
+  const groups={primary:[1,2,3,4,5],middle:[6,7,8],secondary:[9,10],senior:[11,12]};
+  for(const[gk,grades]of Object.entries(groups)){
+    const el=document.getElementById('grade-'+gk);
+    if(!el)continue;
+    el.innerHTML=grades.map(g=>`<button class="grade-btn" id="gb-${g}" onclick="selectGrade(${g})"><div class="grade-btn-n">${g}</div><div class="grade-btn-l">Class ${g}</div></button>`).join('');
+  }
+  // streams
+  const sg=document.getElementById('stream-grid');
+  sg.innerHTML=STREAMS.map(s=>`<button class="stream-btn" id="sb-${s.id}" onclick="selectStream('${s.id}')"><div class="si">${s.icon}</div><div class="sn">${s.label}</div><div style="font-size:9px;color:var(--mu);margin-top:2px">${s.sub}</div></button>`).join('');
+}
+function selectGrade(g){
+  STATE.grade=g;
+  STATE.stream=null;
+  document.querySelectorAll('.grade-btn').forEach(b=>b.classList.remove('on'));
+  const btn=document.getElementById('gb-'+g);
+  if(btn)btn.classList.add('on');
+  // show/hide stream
+  const isSenior=g>=11;
+  document.getElementById('stream-section').style.display=isSenior?'block':'none';
+  document.querySelectorAll('.stream-btn').forEach(b=>b.classList.remove('on'));
+  if(!isSenior){
+    STATE.subjectGroup=GRADE_META[g].group;
+    document.getElementById('grade-continue').disabled=false;
+  } else {
+    STATE.subjectGroup=null;
+    document.getElementById('grade-continue').disabled=true;
+  }
+}
+function selectStream(sid){
+  STATE.stream=sid;
+  STATE.subjectGroup=STREAMS.find(s=>s.id===sid).group;
+  document.querySelectorAll('.stream-btn').forEach(b=>b.classList.remove('on'));
+  const btn=document.getElementById('sb-'+sid);
+  if(btn)btn.classList.add('on');
+  document.getElementById('grade-continue').disabled=false;
+}
+function confirmGrade(){
+  if(!STATE.grade||!STATE.subjectGroup)return;
+  const lbl=GRADE_META[STATE.grade].label+(STATE.stream?' · '+STREAMS.find(s=>s.id===STATE.stream).label:'');
+  document.getElementById('tb-class').textContent=lbl;
+  document.getElementById('home-class').textContent=lbl+' · CBSE';
+  document.getElementById('cg-sub').textContent='Currently: '+lbl;
+  buildHome();
+  showScreen('home');
+}
+
+/* ════════════════════════════════════════════════════════
+   HOME
+════════════════════════════════════════════════════════ */
+function buildHome(){
+  document.getElementById('home-name').textContent=STATE.user.name+' 👋';
+  document.getElementById('streak-n').textContent=STATE.streak;
+  const subjs=getSubjects();
+  const totalQs=subjs.reduce((a,[s])=>a+getQs(s).length,0);
+  const totalAttempted=Object.values(STATE.stats).reduce((a,v)=>a+(v.attempted||0),0);
+  const avgScore=Object.keys(STATE.stats).length?Math.round(Object.values(STATE.stats).reduce((a,v)=>a+(v.avg||0),0)/Object.keys(STATE.stats).length):0;
+  document.getElementById('stats-row').innerHTML=[
+    {icon:'❓',val:totalQs+'+',lbl:'Questions'},
+    {icon:'✅',val:totalAttempted,lbl:'Attempted'},
+    {icon:'📊',val:avgScore+'%',lbl:'Avg Score'},
+    {icon:'📚',val:subjs.length,lbl:'Subjects'},
+  ].map(s=>`<div class="stat-card"><div class="stat-icon">${s.icon}</div><div class="stat-val">${s.val}</div><div class="stat-lbl">${s.lbl}</div></div>`).join('');
+  const d=subjectData();
+  document.getElementById('subj-grid').innerHTML=subjs.map(([name,cfg])=>{
+    const st=STATE.stats[name]||{};
+    const pct=st.avg||0;
+    return `<button class="subj-card" style="--accent:${cfg.color}" onclick="openSubject('${name}')">
+      <div class="subj-top"><span class="subj-icon">${cfg.icon}</span><span class="subj-badge" style="background:${cfg.light};color:${cfg.color}">${getQs(name).length} Qs</span></div>
+      <div class="subj-name">${name}</div><div class="subj-chs">${[...new Set(getQs(name).map(q=>q.chapter))].length} chapters</div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${cfg.color}"></div></div>
+      <div class="subj-stats">${st.attempted||0} attempted · ${pct}% avg</div>
+    </button>`;
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════
+   SUBJECT SCREEN
+════════════════════════════════════════════════════════ */
+function openSubject(name){
+  STATE.curSubject=name;
+  const d=subjectData();
+  if(!d)return;
+  const cfg=d.subjects[name];
+  const qs=getQs(name);
+  if(!qs||qs.length===0){alert('Questions for '+name+' coming soon!');return;}
+  const chapters=['All Chapters',...new Set(qs.map(q=>q.chapter))];
+  // hero
+  document.getElementById('subj-hero').style.cssText=`background:linear-gradient(135deg,${cfg.color}18,${cfg.color}35);border-bottom-color:${cfg.color};`;
+  document.getElementById('subj-hero').innerHTML=`<span class="subj-hero-icon">${cfg.icon}</span><div><div class="subj-hero-title" style="color:${cfg.color}">${name}</div><div class="subj-hero-sub">${qs.length} questions · ${chapters.length-1} chapters</div></div>`;
+  // chapter
+  const sel=document.getElementById('f-chapter');
+  sel.innerHTML=chapters.map(c=>`<option>${c}</option>`).join('');
+  sel.value='All Chapters';
+  // diff pills
+  const dc=document.getElementById('f-diff-row');
+  dc.innerHTML=['All','Easy','Medium','Hard'].map(d=>`<button class="pill${d==='All'?' on-pill':''}" onclick="setPill(this,'diff','${d}')" data-val="${d}">${d}</button>`).join('');
+  // type pills
+  const tc=document.getElementById('f-type-row');
+  tc.innerHTML=['All','MCQ','TF','FIB'].map(t=>`<button class="pill${t==='All'?' on-pill':''}" onclick="setPill(this,'type','${t}')" data-val="${t}">${t==='TF'?'True/False':t==='FIB'?'Fill Blank':t}</button>`).join('');
+  // count pills
+  const cc=document.getElementById('f-count-row');
+  cc.innerHTML=[5,10,15,20].map(n=>`<button class="pill${n===10?' on-pill':''}" onclick="setPill(this,'count',${n})" data-val="${n}">${n} Qs</button>`).join('');
+  STATE.quizFilter={chapter:'All Chapters',difficulty:'All',type:'All',count:10};
+  updateAvail(cfg.color,name);
+  sel.onchange=()=>{STATE.quizFilter.chapter=sel.value;updateAvail(cfg.color,name);};
+  showScreen('subject');
+}
+function setPill(el,key,val){
+  const row=el.parentElement;
+  row.querySelectorAll('.pill').forEach(p=>p.classList.remove('on-pill'));
+  el.classList.add('on-pill');
+  STATE.quizFilter[key]=isNaN(val)?val:parseInt(val);
+  const d=subjectData();
+  if(d&&STATE.curSubject&&d.subjects[STATE.curSubject])updateAvail(d.subjects[STATE.curSubject].color,STATE.curSubject);
+}
+function updateAvail(color,name){
+  const {chapter,difficulty,type,count}=STATE.quizFilter;
+  const qs=getQs(name).filter(q=>(chapter==='All Chapters'||q.chapter===chapter)&&(difficulty==='All'||q.difficulty===difficulty)&&(type==='All'||q.type===type));
+  document.getElementById('avail-badge').textContent=qs.length+' questions match your filters';
+  const btn=document.getElementById('start-quiz-btn');
+  btn.disabled=qs.length===0;
+  btn.style.background=qs.length?color:'';
+  // update on-pill styles
+  document.querySelectorAll('.pill.on-pill').forEach(p=>{p.style.background=color;p.style.color='#fff';p.style.borderColor=color;});
+  document.querySelectorAll('.pill:not(.on-pill)').forEach(p=>{p.style.background='';p.style.color='';p.style.borderColor='';});
+}
+function beginQuiz(){
+  const {chapter,difficulty,type,count}=STATE.quizFilter;
+  const name=STATE.curSubject;
+  let qs=getQs(name).filter(q=>(chapter==='All Chapters'||q.chapter===chapter)&&(difficulty==='All'||q.difficulty===difficulty)&&(type==='All'||q.type===type));
+  if(!qs.length)return;
+  qs=shuffle(qs).slice(0,count);
+  STATE.curQuestions=qs;
+  STATE.curAnswers=[];
+  STATE.curIdx=0;
+  showScreen('quiz');
+  renderQ();
+}
+function startMixed(){
+  const subjs=getSubjects();
+  let pool=[];
+  subjs.forEach(([s])=>{const qs=getQs(s);if(qs.length)pool.push(...qs.slice(0,5));});
+  if(!pool.length){alert('No questions available.');return;}
+  STATE.curSubject='Mixed';
+  STATE.curQuestions=shuffle(pool).slice(0,10);
+  STATE.curAnswers=[];STATE.curIdx=0;
+  showScreen('quiz');renderQ();
+}
+function startDaily(){
+  const subjs=getSubjects();
+  let pool=[];
+  subjs.forEach(([s])=>{const qs=getQs(s);if(qs.length)pool.push(qs[Math.floor(Math.random()*qs.length)]);});
+  STATE.curSubject='Daily';
+  STATE.curQuestions=shuffle(pool).slice(0,5);
+  STATE.curAnswers=[];STATE.curIdx=0;
+  showScreen('quiz');renderQ();
+}
+
+/* ════════════════════════════════════════════════════════
+   QUIZ ENGINE
+════════════════════════════════════════════════════════ */
+function renderQ(){
+  clearInterval(STATE.timerRef);
+  const qs=STATE.curQuestions;
+  const idx=STATE.curIdx;
+  const q=qs[idx];
+  const d=subjectData();
+  const cfg=(d&&d.subjects&&d.subjects[STATE.curSubject])||{color:'#F97316',light:'#FFF7ED'};
+  const color=cfg.color;
+  document.getElementById('q-cur').textContent=idx+1;
+  document.getElementById('q-tot').textContent=qs.length;
+  // dots
+  document.getElementById('dot-row').innerHTML=qs.map((_,i)=>{
+    const a=STATE.curAnswers[i];
+    const bg=i<idx?(a?.correct?'#16A34A':'#DC2626'):i===idx?color:'#E7E5E4';
+    const sz=i===idx?12:8;
+    return `<div class="dot" style="background:${bg};width:${sz}px;height:${sz}px"></div>`;
+  }).join('');
+  // timer
+  STATE.timeLeft=q.time||30;
+  document.getElementById('timer-badge').style.background=color+'22';
+  document.getElementById('timer-badge').style.borderColor=color;
+  document.getElementById('timer-badge').style.color=color;
+  document.getElementById('q-card-accent').style.background=color;
+  // meta
+  document.getElementById('q-meta').innerHTML=
+    `<span class="q-badge" style="background:${cfg.light};color:${color}">${q.chapter}</span>`+
+    `<span class="q-badge" style="background:${q.difficulty==='Easy'?'#F0FDF4':q.difficulty==='Medium'?'#FFFBEB':'#FEF2F2'};color:${q.difficulty==='Easy'?'#16A34A':q.difficulty==='Medium'?'#D97706':'#DC2626'}">${q.difficulty}</span>`+
+    `<span class="q-badge" style="background:#F1EEE8;color:#78716C">${q.type}</span>`;
+  document.getElementById('q-text').textContent=q.question;
+  document.getElementById('q-exp').style.display='none';
+  document.getElementById('q-next').style.display='none';
+  // options
+  const optsEl=document.getElementById('q-opts');
+  if(q.type==='MCQ'||q.type==='TF'){
+    optsEl.innerHTML='';
+    q.options.forEach((opt,i)=>{
+      const btn=document.createElement('button');
+      btn.className='opt-btn';
+      btn.innerHTML=`<span class="opt-letter" style="background:${color}">${['A','B','C','D'][i]||i}</span><span class="opt-text">${opt}</span>`;
+      btn.addEventListener('click',()=>revealQ(opt));
+      optsEl.appendChild(btn);
+    });
+  } else {
+    optsEl.innerHTML=`<div class="fib-wrap"><input class="fib-input" id="fib-in" placeholder="Type your answer…"><button class="fib-submit" style="background:${color}" onclick="revealQ(document.getElementById('fib-in').value)">Submit →</button></div>`;
+    const fi=document.getElementById('fib-in');
+    fi.addEventListener('keydown',e=>{ if(e.key==='Enter')revealQ(fi.value); });
+  }
+  // timer
+  updateTimer(color);
+  STATE.timerRef=setInterval(()=>{
+    STATE.timeLeft--;
+    updateTimer(color);
+    if(STATE.timeLeft<=0){clearInterval(STATE.timerRef);revealQ(null);}
+  },1000);
+}
+function updateTimer(color){
+  const q=STATE.curQuestions[STATE.curIdx];
+  const max=q?.time||30;
+  const pct=(STATE.timeLeft/max)*100;
+  const tc=STATE.timeLeft>10?color:STATE.timeLeft>5?'#D97706':'#DC2626';
+  document.getElementById('timer-badge').textContent='⏱ '+STATE.timeLeft+'s';
+  document.getElementById('timer-badge').style.color=tc;
+  document.getElementById('timer-badge').style.borderColor=tc;
+  document.getElementById('timer-bar').style.width=pct+'%';
+  document.getElementById('timer-bar').style.background=tc;
+}
+function revealQ(sel){
+  clearInterval(STATE.timerRef);
+  const q=STATE.curQuestions[STATE.curIdx];
+  const d=subjectData();
+  const cfg=(d&&d.subjects&&d.subjects[STATE.curSubject])||{color:'#F97316'};
+  let correct=false;
+  let correctAns='';
+  if(q.type==='FIB'){
+    correctAns=q.answer;
+    correct=(sel||'').trim().toLowerCase()===q.answer.toLowerCase();
+  } else {
+    const ansIdx=['A','B','C','D'].indexOf(q.answer);
+    correctAns=q.options[ansIdx>=0?ansIdx:0];
+    correct=sel===correctAns;
+  }
+  STATE.curAnswers.push({qid:q.id,correct,selected:sel,correctAns,time:q.time-STATE.timeLeft});
+  // update opts
+  if(q.type==='MCQ'||q.type==='TF'){
+    document.querySelectorAll('.opt-btn').forEach((btn,i)=>{
+      btn.disabled=true;
+      const opt=btn.querySelector('.opt-text').textContent;
+      if(opt===correctAns)btn.classList.add('ok');
+      else if(opt===sel&&!correct)btn.classList.add('wrong');
+      else btn.style.opacity='0.5';
+      const letter=btn.querySelector('.opt-letter');
+      if(opt===correctAns)letter.style.background='#16A34A';
+      else if(opt===sel&&!correct)letter.style.background='#DC2626';
+    });
+  }
+  // fib feedback
+  if(q.type==='FIB'){
+    const fi=document.getElementById('fib-in');
+    if(fi){fi.disabled=true;fi.style.borderColor=correct?'#16A34A':'#DC2626';fi.style.background=correct?'#F0FDF4':'#FEF2F2';}
+  }
+  // explanation
+  const expEl=document.getElementById('q-exp');
+  expEl.style.display='block';
+  expEl.className='exp-box';
+  expEl.style.background=correct?'#F0FDF4':'#FEF2F2';
+  expEl.style.borderLeftColor=correct?'#16A34A':'#DC2626';
+  expEl.innerHTML=`<div class="exp-title" style="color:${correct?'#16A34A':'#DC2626'}">${correct?'✓ Correct!':'✗ Correct answer: '+correctAns}</div><div class="exp-text">${q.explanation}</div>`;
+  // next btn
+  const isLast=STATE.curIdx===STATE.curQuestions.length-1;
+  const nb=document.getElementById('q-next');
+  nb.style.display='block';
+  nb.textContent=isLast?'See Results →':'Next →';
+  nb.style.background=cfg.color;
+}
+function nextQ(){
+  const isLast=STATE.curIdx===STATE.curQuestions.length-1;
+  if(isLast){ showResult(); return; }
+  STATE.curIdx++;
+  renderQ();
+}
+function confirmQuit(){
+  if(confirm('Quit this quiz?')){clearInterval(STATE.timerRef);showScreen('home');}
+}
+
+/* ════════════════════════════════════════════════════════
+   RESULTS
+════════════════════════════════════════════════════════ */
+function showResult(){
+  clearInterval(STATE.timerRef);
+  const ans=STATE.curAnswers;
+  const qs=STATE.curQuestions;
+  const correct=ans.filter(a=>a.correct).length;
+  const pct=Math.round((correct/qs.length)*100);
+  const gr=getGrade(pct);
+  const avgTime=Math.round(ans.reduce((a,b)=>a+(b.time||0),0)/ans.length);
+  STATE.lastResult={qs,ans,pct,correct,gr};
+  // update stats
+  if(STATE.curSubject&&STATE.curSubject!=='Mixed'&&STATE.curSubject!=='Daily'){
+    const s=STATE.stats[STATE.curSubject]||{attempted:0,totalCorrect:0,totalQ:0};
+    s.attempted+=qs.length;s.totalCorrect+=correct;s.totalQ+=qs.length;
+    s.avg=Math.round((s.totalCorrect/s.totalQ)*100);
+    STATE.stats[STATE.curSubject]=s;
+  }
+  STATE.streak++;
+  const d=subjectData();
+  const cfg=(d&&d.subjects&&d.subjects[STATE.curSubject])||{color:'#F97316'};
+  document.getElementById('result-hero').style.background=`linear-gradient(135deg,${cfg.color}10,${cfg.color}30)`;
+  document.getElementById('result-hero').innerHTML=`
+    <div class="grade-circle" style="background:${gr.c}">${gr.l}</div>
+    <div class="result-pct">${pct}%</div>
+    <div class="result-sub">${correct} of ${qs.length} correct</div>
+    <div class="result-stats">
+      <div><span class="r-stat-val" style="color:#16A34A">${correct}</span><span class="r-stat-lbl">Correct</span></div>
+      <div><span class="r-stat-val" style="color:#DC2626">${qs.length-correct}</span><span class="r-stat-lbl">Wrong</span></div>
+      <div><span class="r-stat-val" style="color:#D97706">${avgTime}s</span><span class="r-stat-lbl">Avg Time</span></div>
+    </div>`;
+  document.getElementById('retry-btn').style.background=cfg.color;
+  setTab('summary');
+  showScreen('result');
+}
+function setTab(t){
+  document.getElementById('tab-summary').classList.toggle('on',t==='summary');
+  document.getElementById('tab-review').classList.toggle('on',t==='review');
+  const d=subjectData();
+  const cfg=(d&&d.subjects&&d.subjects[STATE.curSubject])||{color:'#F97316'};
+  const {qs,ans}=STATE.lastResult||{qs:STATE.curQuestions,ans:STATE.curAnswers};
+  if(t==='summary'){
+    const chapters=[...new Set(qs.map(q=>q.chapter))];
+    document.getElementById('tab-content').innerHTML=`
+      <div style="margin-bottom:16px">`+
+      chapters.map(ch=>{
+        const cQs=qs.filter(q=>q.chapter===ch);
+        const cAns=ans.filter((a,i)=>qs[i]?.chapter===ch);
+        const cPct=cQs.length?Math.round((cAns.filter(a=>a.correct).length/cQs.length)*100):0;
+        return `<div class="ch-row"><div class="ch-name">${ch}</div><div class="ch-bar-wrap"><div class="ch-bar-fill" style="width:${cPct}%;background:${cfg.color}"></div></div><div class="ch-pct">${cPct}%</div></div>`;
+      }).join('')+`</div>`;
+  } else {
+    document.getElementById('tab-content').innerHTML=qs.map((q,i)=>{
+      const a=ans[i];
+      const ok=a?.correct;
+      return `<div class="review-card">
+        <div style="display:flex;gap:6px;margin-bottom:6px"><span style="background:${ok?'#F0FDF4':'#FEF2F2'};color:${ok?'#16A34A':'#DC2626'};border-radius:6px;padding:1px 8px;font-size:11px;font-weight:700">${ok?'✓':'✗'}</span><span style="font-size:10px;color:var(--mu);background:#F5F0E8;padding:1px 8px;border-radius:6px">${q.chapter}</span></div>
+        <div class="review-q">${q.question}</div>
+        <div class="review-ans" style="color:${ok?'#16A34A':'#DC2626'};font-size:12px;font-weight:600">Your answer: ${a?.selected||'—'}</div>
+        ${!ok?`<div class="review-ans" style="color:#16A34A;font-size:12px">Correct: ${a?.correctAns||q.answer}</div>`:''}
+        <div style="font-size:12px;color:#555;margin-top:4px;line-height:1.5">${q.explanation}</div>
+      </div>`;
+    }).join('');
+  }
+}
+function retryQuiz(){
+  STATE.curAnswers=[];STATE.curIdx=0;
+  STATE.curQuestions=shuffle(STATE.curQuestions);
+  showScreen('quiz');renderQ();
+}
+function navTo(scr){
+  if(scr==='subject'&&STATE.curSubject&&STATE.curSubject!=='Mixed')openSubject(STATE.curSubject);
+  else if(scr==='result'&&STATE.lastResult)showScreen('result');
+  else showScreen(scr);
+}
+
+/* ════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════ */
+setAuthMode('login');
+</script>
+</body>
+</html>
